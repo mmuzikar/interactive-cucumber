@@ -1,22 +1,29 @@
-.App {
-  text-align: center;
+.history-entry-status-success {
+    color: #13bd27;
 }
 
-.App-logo {
-  height: 40vmin;
+.history-entry-status-failure {
+    color: #e02d1d;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.history-entry-status-waiting {
+    color: #e0b61d;
 }
 
-.App-link {
-  color: #09d3ac;
+.complete-prompt {
+    display: block;
+    position: absolute;
+    z-index: 10;
+    margin: 0;
+    width: 85%;
+    background: gray;
+}
+
+.complete-prompt li {
+    line-height: 20px;
+}
+
+.complete-prompt-entry-active::before {
+    content: ">";
+    color: blue;
 }
