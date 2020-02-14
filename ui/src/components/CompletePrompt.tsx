@@ -1,23 +1,23 @@
 import React, { Component } from "react";
 import Fuse, { FuseOptions } from "fuse.js";
-import { Step } from "../interop/cucumberTypes";
-import { StepManager } from "../interop/stepManager";
 import { keyDispatcher } from "./TerminalInput";
 
-type Props = {
+type Props<T> = {
     value: string,
     show: boolean,
+    getData: () => Promise<T[]>,
     toggleSending: (arg0:boolean) => void,
-    fillIn: (arg0:Step) => void
+    fillIn: (arg0:T) => void,
+    render: (arg0:T) => JSX.Element
 };
-type State = {
-    steps: Step[],
+type State<T> = {
+    data: T[],
     currentIndex: number
 };
 
-export class TerminalCompletePrompt extends Component<Props, State> {
+export class CompletePrompt<T> extends Component<Props<T>, State<T>> {
 
-    static fuseOptions : FuseOptions<Step> = {
+    fuseOptions : FuseOptions<T> = {
         shouldSort: true,
         threshold: 0.6,
         location: 0,
@@ -35,12 +35,12 @@ export class TerminalCompletePrompt extends Component<Props, State> {
         ]
     }
     state = {
-        steps: [],
+        data: [],
         currentIndex: -1
     }
 
     componentDidMount(){
-        const outOfRange = () => this.state.currentIndex === -1 || this.state.currentIndex === this.state.steps.length;
+        const outOfRange = () => this.state.currentIndex === -1 || this.state.currentIndex === this.state.data.length;
         keyDispatcher.register((event) => {
             if (!this.props.show){
                 this.props.toggleSending(true);
@@ -53,13 +53,13 @@ export class TerminalCompletePrompt extends Component<Props, State> {
                     });
                 } else {
                     this.setState((prevState) => ({
-                        currentIndex: Math.min(prevState.currentIndex+1, prevState.steps.length)
+                        currentIndex: Math.min(prevState.currentIndex+1, prevState.data.length)
                     }))
                 }
             } else if (event.key === "ArrowUp"){
                 if (outOfRange()){
                     this.setState({
-                        currentIndex: this.state.steps.length - 1
+                        currentIndex: this.state.data.length - 1
                     })
                 } else {
                     this.setState((prevState) => ({
@@ -68,21 +68,21 @@ export class TerminalCompletePrompt extends Component<Props, State> {
                 }
             } else if (event.key === "Enter"){
                 if (!outOfRange()){
-                    this.props.fillIn((this.state.steps[this.state.currentIndex] as Step));
+                    this.props.fillIn((this.state.data[this.state.currentIndex] as T));
                 }
             }
             this.props.toggleSending(outOfRange());
         })
     }
 
-    componentDidUpdate(prevProps:Props){
+    componentDidUpdate(prevProps:Props<T>){
         if (this.props.value !== prevProps.value){
-            StepManager.get().getSteps().then((steps) => {
-                if (steps){
-                    const fuse = new Fuse(steps, TerminalCompletePrompt.fuseOptions);
+            this.props.getData().then(val => {
+                if (val){
+                    const fuse = new Fuse(val, this.fuseOptions);
                     const results = fuse.search(this.props.value);
                     this.setState({
-                        steps: results as Step[],
+                        data: results as T[],
                         currentIndex: -1
                     });
                 }
@@ -91,13 +91,13 @@ export class TerminalCompletePrompt extends Component<Props, State> {
     }
 
     render(){
-        const offset = (this.state.steps.length * 20);
+        const offset = (this.state.data.length * 20);
         if (!this.props.show){
             return <></>;
         }
         return <ul className="complete-prompt" style={{top: -offset}}>
-            {(this.state.steps||[]).map((val:Step, i) => 
-                <CompleteEntry setActive={(active) => {
+            {(this.state.data||[]).map((val:T, i) => 
+                <CompleteEntry<T> setActive={(active) => {
                     if (active){
                         this.setState({
                             currentIndex: i
@@ -108,22 +108,23 @@ export class TerminalCompletePrompt extends Component<Props, State> {
                         })
                     }
                 }} active={i === this.state.currentIndex} 
-                step={val} 
+                value={val} 
                 key={`complete_${i}`}
-                fillIn={() => this.props.fillIn((this.state.steps[this.state.currentIndex] as Step))}
+                render={this.props.render}
+                fillIn={() => this.props.fillIn((this.state.data[this.state.currentIndex] as T))}
                 />)}
         </ul>;
     }
 }
 
-class CompleteEntry extends Component<{active: boolean, step:Step, setActive: (arg0:boolean) => void, fillIn: () => void}> {
+class CompleteEntry<T> extends Component<{active: boolean, render: (arg0:T) => JSX.Element, value:T, setActive: (arg0:boolean) => void, fillIn: () => void}> {
 
     render(){
         return <li className={this.props.active?"complete-prompt-entry-active":""} 
             onMouseEnter={() => this.props.setActive(true)} 
             onMouseLeave={() => this.props.setActive(false)}
             onClick={this.props.fillIn}>
-            {this.props.step.pattern}
+            {this.props.render(this.props.value)}
         </li>
     }
 

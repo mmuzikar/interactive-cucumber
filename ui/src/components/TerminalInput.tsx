@@ -1,5 +1,5 @@
 import React, { Component, ChangeEvent } from "react";
-import { TerminalCompletePrompt } from "./TerminalCompletePrompt";
+import { CompletePrompt } from "./CompletePrompt";
 import { StepManager } from "../interop/stepManager";
 import { Dispatcher } from "flux";
 import { Step, Argument } from "../interop/cucumberTypes";
@@ -30,8 +30,22 @@ export class TerminalInput extends Component<{}, State> {
         parsedInput: []
     }
 
-    handleSubmit(input:HTMLInputElement){
-        StepManager.get().runStep(input.value);
+    handleSubmit(target:HTMLElement){
+        console.debug(target);
+        let stepBuild = '';
+        for (let i = 0; i < target.children.length; i++){
+            const item = target.children.item(i);
+            if (item instanceof HTMLInputElement){
+                stepBuild += item.value;
+            } else {
+                stepBuild += (item as HTMLElement).textContent;
+            }
+        }
+        StepManager.get().runStep(stepBuild);
+        this.setState({
+            parsedInput: [],
+            stepRef: undefined
+        });
     }
 
     getStepRef(){
@@ -44,7 +58,7 @@ export class TerminalInput extends Component<{}, State> {
             case "Enter":
                 input.preventDefault();
                 if (this.state.stepRef !== undefined && this.state.val.length > 0){
-                    this.handleSubmit(target);
+                    this.handleSubmit(document.getElementById("terminal-input")!);
                 //TODO: if user is pressing Enter repeatedly tell them they need to use Shift
                 } else if (input.shiftKey){
                     this.handleSubmit(target);
@@ -66,6 +80,13 @@ export class TerminalInput extends Component<{}, State> {
                     }
                 }
                 break;
+            case "Escape":
+                input.preventDefault();
+                this.setState({
+                    parsedInput: [],
+                    stepRef: undefined
+                });
+            break;
             default:
                 if (this.state.stepRef){
                     let i = 0;
@@ -112,10 +133,9 @@ export class TerminalInput extends Component<{}, State> {
         }
         this.setState({val: step ? step.pattern : "", parsedInput: split, stepRef: step}, () => {
             if (step && step.args){
-                const input = document.getElementById("terminal-input") as HTMLInputElement;
-                if (input){
-                    input.focus();
-                    input.setSelectionRange(step.args[0].start!, step.args[0].end! + 1);
+                const firstInput = document.getElementById('arg-0') as HTMLInputElement;
+                if (firstInput){
+                    firstInput.focus();
                 }
             }
         });
@@ -123,21 +143,29 @@ export class TerminalInput extends Component<{}, State> {
 
     render(){
         let val = this.state.parsedInput.length > 0 && false ? this.state.parsedInput.join("") : this.state.val;
-        let input = <input id="terminal-input" style={{width: "85%"}} value={val} onInput={this.handleChange} onKeyDownCapture={this.handleInput}/>;
+        let input = <input autoFocus id="terminal-input" style={{width: "85%"}} value={val} onInput={this.handleChange} onKeyDownCapture={this.handleInput}/>;
         if (this.state.parsedInput.length > 0){
-            input = <div>
+            input = <div id="terminal-input" onKeyDownCapture={this.handleInput}>
                 {
                     this.state.parsedInput.map((val, i) => 
-                        typeof(val) === "string" ? <span key={`const_${i}`}>{val}</span> : <input key={`var_${val}`} id={val}/>
+                        typeof(val) === "string" ? <span key={`const_${i}`}>{val}</span> : <input onKeyPress={(event) => {
+                            if (event.key === "Enter"){
+                                this.handleSubmit(document.getElementById("terminal-input") as HTMLInputElement);
+                            }
+                        }} key={`var_${val}`} className='arg' id={`arg-${i}`}
+                        autoFocus={val === 0}
+                        />
                     )
                 }
             </div>;
         }
         return <div style={{width: "100% "}}>
-            <TerminalCompletePrompt value={this.state.val} 
+            <CompletePrompt<Step> value={this.state.val} 
                 toggleSending={(arg) => this.setState({canSend: arg})}
                 show={this.state.stepRef === undefined}
                 fillIn={this.onSetStep}
+                getData={() => StepManager.get().getSteps()}
+                render={(step) => <span>{step.pattern}</span>}
             />
             {input}
             <input type="submit"/>
