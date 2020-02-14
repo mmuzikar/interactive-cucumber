@@ -15,7 +15,7 @@ type State = {
     currentIndex: number
 };
 
-export class CompletePrompt extends Component<Props, State> {
+export class TerminalCompletePrompt extends Component<Props, State> {
 
     static fuseOptions : FuseOptions<Step> = {
         shouldSort: true,
@@ -79,7 +79,7 @@ export class CompletePrompt extends Component<Props, State> {
         if (this.props.value !== prevProps.value){
             StepManager.get().getSteps().then((steps) => {
                 if (steps){
-                    const fuse = new Fuse(steps, CompletePrompt.fuseOptions);
+                    const fuse = new Fuse(steps, TerminalCompletePrompt.fuseOptions);
                     const results = fuse.search(this.props.value);
                     this.setState({
                         steps: results as Step[],

@@ -1,5 +1,5 @@
 import React, { Component, ChangeEvent } from "react";
-import { CompletePrompt } from "./CompletePrompt";
+import { TerminalCompletePrompt } from "./TerminalCompletePrompt";
 import { StepManager } from "../interop/stepManager";
 import { Dispatcher } from "flux";
 import { Step, Argument } from "../interop/cucumberTypes";
@@ -10,6 +10,7 @@ type State = {
     val:string, 
     canSend:boolean, 
     stepRef?: Step,
+    parsedInput: (string | number)[]
 };
 
 export class TerminalInput extends Component<{}, State> {
@@ -26,6 +27,7 @@ export class TerminalInput extends Component<{}, State> {
         val: "",
         canSend: true,
         stepRef: undefined,
+        parsedInput: []
     }
 
     handleSubmit(input:HTMLInputElement){
@@ -65,7 +67,21 @@ export class TerminalInput extends Component<{}, State> {
                 }
                 break;
             default:
-
+                if (this.state.stepRef){
+                    let i = 0;
+                    let accum = 0;
+                    const cursor = target.selectionStart;
+                    for (let val of (this.state.parsedInput as string[])){
+                        accum += val.length;
+                        console.debug(`cursor: ${cursor} accum: ${accum} for val ${val}`);
+                        if (cursor! <= accum){
+                            break;
+                        }
+                        i++;
+                    }
+                    target.selectionStart = cursor;
+                    console.log(`index: ${i} cursor: ${cursor}`);
+                }
             break;
         }
         keyDispatcher.dispatch(input);
@@ -84,7 +100,17 @@ export class TerminalInput extends Component<{}, State> {
     }
 
     onSetStep(step: Step){
-        this.setState({val: step ? step.pattern : "", stepRef: step}, () => {
+        let split = [];
+        if (step && step.args){
+            split.push(step.pattern.substring(0, step.args[0].start!));
+            split.push(0);
+            for (let i = 1; i < step.args.length; i++){
+                split.push(step.pattern.substring(step.args[i-1].end! + 1, step.args[i].start!));
+                split.push(i);
+            }
+            split.push(step.pattern.substring(step.args[step.args.length - 1].end! + 1));
+        }
+        this.setState({val: step ? step.pattern : "", parsedInput: split, stepRef: step}, () => {
             if (step && step.args){
                 const input = document.getElementById("terminal-input") as HTMLInputElement;
                 if (input){
@@ -96,13 +122,24 @@ export class TerminalInput extends Component<{}, State> {
     }
 
     render(){
+        let val = this.state.parsedInput.length > 0 && false ? this.state.parsedInput.join("") : this.state.val;
+        let input = <input id="terminal-input" style={{width: "85%"}} value={val} onInput={this.handleChange} onKeyDownCapture={this.handleInput}/>;
+        if (this.state.parsedInput.length > 0){
+            input = <div>
+                {
+                    this.state.parsedInput.map((val, i) => 
+                        typeof(val) === "string" ? <span key={`const_${i}`}>{val}</span> : <input key={`var_${val}`} id={val}/>
+                    )
+                }
+            </div>;
+        }
         return <div style={{width: "100% "}}>
-            <CompletePrompt value={this.state.val} 
+            <TerminalCompletePrompt value={this.state.val} 
                 toggleSending={(arg) => this.setState({canSend: arg})}
                 show={this.state.stepRef === undefined}
                 fillIn={this.onSetStep}
             />
-            <input id="terminal-input" style={{width: "85%"}} value={this.state.val} onChange={this.handleChange} onKeyDownCapture={this.handleInput}/>
+            {input}
             <input type="submit"/>
         </div>
     }
