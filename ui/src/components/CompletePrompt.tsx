@@ -5,13 +5,15 @@ import { keyDispatcher } from "./TerminalInput";
 type Props<T> = {
     value: string,
     show: boolean,
-    getData: () => Promise<T[]>,
+    keys?: {name: string, weight: number}[]
+    getData: () => Promise<T[]> | undefined,
     toggleSending: (arg0:boolean) => void,
     fillIn: (arg0:T) => void,
     render: (arg0:T) => JSX.Element
 };
 type State<T> = {
     data: T[],
+    loading: boolean,
     currentIndex: number
 };
 
@@ -24,17 +26,10 @@ export class CompletePrompt<T> extends Component<Props<T>, State<T>> {
         distance: 100,
         maxPatternLength: 32,
         minMatchCharLength: 1,
-        keys: [
-            {
-                name: "pattern",
-                weight: 0.7
-            }, {
-                name: "docs",
-                weight: 0.3
-            }
-        ]
+        keys: this.props.keys
     }
     state = {
+        loading: false,
         data: [],
         currentIndex: -1
     }
@@ -73,20 +68,31 @@ export class CompletePrompt<T> extends Component<Props<T>, State<T>> {
             }
             this.props.toggleSending(outOfRange());
         })
+        this.updateValues();
     }
 
-    componentDidUpdate(prevProps:Props<T>){
-        if (this.props.value !== prevProps.value){
-            this.props.getData().then(val => {
+    updateValues(){
+        const val = this.props.getData();
+        if (val){
+            this.setState({loading: true});
+            val.then(val => {
                 if (val){
                     const fuse = new Fuse(val, this.fuseOptions);
                     const results = fuse.search(this.props.value);
                     this.setState({
                         data: results as T[],
-                        currentIndex: -1
+                        currentIndex: -1,
+                        loading: false
                     });
                 }
             })
+        }
+    }
+
+    componentDidUpdate(prevProps:Props<T>, prevState:State<T>){
+        if (this.props.value !== prevProps.value){
+            console.debug("Prop value changed!");
+            this.updateValues();
         }
     }
 
@@ -94,6 +100,9 @@ export class CompletePrompt<T> extends Component<Props<T>, State<T>> {
         const offset = (this.state.data.length * 20);
         if (!this.props.show){
             return <></>;
+        }
+        if (this.state.loading){
+            return <div className="complete-prompt" style={{top: -offset}}>Loading...</div>
         }
         return <ul className="complete-prompt" style={{top: -offset}}>
             {(this.state.data||[]).map((val:T, i) => 

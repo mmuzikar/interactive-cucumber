@@ -57,29 +57,31 @@ export class TerminalInput extends Component<{}, State> {
         switch(input.key){
             case "Enter":
                 input.preventDefault();
-                if (this.state.stepRef !== undefined && this.state.val.length > 0){
+                if (input.shiftKey){
                     this.handleSubmit(document.getElementById("terminal-input")!);
-                //TODO: if user is pressing Enter repeatedly tell them they need to use Shift
-                } else if (input.shiftKey){
-                    this.handleSubmit(target);
                 }
+                // if (this.state.stepRef !== undefined && this.state.val.length > 0){
+                //     this.handleSubmit(document.getElementById("terminal-input")!);
+                // //TODO: if user is pressing Enter repeatedly tell them they need to use Shift
+                // } else if (input.shiftKey){
+                //     this.handleSubmit(target);
+                // }
             break;
             case "Tab":
-                input.preventDefault();
-                if (this.state.stepRef && this.state.stepRef !== undefined && this.getStepRef().args){
-                    let offset = this.state.val.length - this.getStepRef().pattern.length;
-                    //TODO: ugh
-                    let i = 0;
-                    const args = this.getStepRef().args as Argument[];
-                    while(target.selectionStart! < args[i].start!){
-                        i++;
-                        if (i > args.length){
-                            i = 0;
-                            break;
+                if (this.state.parsedInput.length > 0){
+                    input.preventDefault();
+                    const active = document.activeElement;
+                    if (active && active.classList.contains('arg')){
+                        const id = Number.parseInt(active.getAttribute('tabIndex')!);
+                        const inputs = document.getElementsByClassName('arg');
+                        if (id + 1 >= inputs.length){
+                            (inputs.item(0)! as HTMLElement).focus();
+                        } else {
+                            (inputs.item(id + 1)! as HTMLElement).focus();
                         }
                     }
                 }
-                break;
+            break;
             case "Escape":
                 input.preventDefault();
                 this.setState({
@@ -88,21 +90,7 @@ export class TerminalInput extends Component<{}, State> {
                 });
             break;
             default:
-                if (this.state.stepRef){
-                    let i = 0;
-                    let accum = 0;
-                    const cursor = target.selectionStart;
-                    for (let val of (this.state.parsedInput as string[])){
-                        accum += val.length;
-                        console.debug(`cursor: ${cursor} accum: ${accum} for val ${val}`);
-                        if (cursor! <= accum){
-                            break;
-                        }
-                        i++;
-                    }
-                    target.selectionStart = cursor;
-                    console.log(`index: ${i} cursor: ${cursor}`);
-                }
+
             break;
         }
         keyDispatcher.dispatch(input);
@@ -143,21 +131,32 @@ export class TerminalInput extends Component<{}, State> {
 
     render(){
         let val = this.state.parsedInput.length > 0 && false ? this.state.parsedInput.join("") : this.state.val;
-        let input = <input autoFocus id="terminal-input" style={{width: "85%"}} value={val} onInput={this.handleChange} onKeyDownCapture={this.handleInput}/>;
+        let input = <input autoFocus id="terminal-input" style={{width: "85%"}} value={val} onChange={this.handleChange} onKeyDownCapture={this.handleInput}/>;
         if (this.state.parsedInput.length > 0){
-            input = <div id="terminal-input" onKeyDownCapture={this.handleInput}>
+            const focusedInput = document.activeElement as HTMLInputElement;
+            input = <>
+                <CompletePrompt<{val: string}> value={focusedInput.value}
+                    getData={() =>StepManager.get().getSuggestionForArg(this.state.stepRef!, focusedInput.tabIndex)}
+                    fillIn={(val) => focusedInput.value = val.val}
+                    render={(arg) => <span>{arg.val}</span>}
+                    show={focusedInput !== undefined}
+                    toggleSending={(arg) => this.setState({canSend: arg})}
+                    keys={[{
+                        name: "val",
+                        weight: 1
+                    }]}
+                />
+                <span id="terminal-input" onKeyDownCapture={this.handleInput}>
                 {
                     this.state.parsedInput.map((val, i) => 
-                        typeof(val) === "string" ? <span key={`const_${i}`}>{val}</span> : <input onKeyPress={(event) => {
-                            if (event.key === "Enter"){
-                                this.handleSubmit(document.getElementById("terminal-input") as HTMLInputElement);
-                            }
-                        }} key={`var_${val}`} className='arg' id={`arg-${i}`}
-                        autoFocus={val === 0}
-                        />
+                        typeof(val) === "string" ? 
+                            <span key={`const_${i}`}>{val}</span> : 
+                            <input key={`var_${val}`} className='arg' id={`arg-${val}`}
+                            autoFocus={val === 0} tabIndex={val} onChange={() => this.forceUpdate()}
+                            />
                     )
                 }
-            </div>;
+                </span></>;
         }
         return <div style={{width: "100% "}}>
             <CompletePrompt<Step> value={this.state.val} 
@@ -166,6 +165,15 @@ export class TerminalInput extends Component<{}, State> {
                 fillIn={this.onSetStep}
                 getData={() => StepManager.get().getSteps()}
                 render={(step) => <span>{step.pattern}</span>}
+                keys={[
+                    {
+                        name: "pattern",
+                        weight: 0.7
+                    }, {
+                        name: "docs",
+                        weight: 0.3
+                    }
+                ]}
             />
             {input}
             <input type="submit"/>

@@ -54,6 +54,36 @@ export class StepManager {
         })
     }
 
+    getSuggestionForArg(step:Step, i:number, stepArgs:string[] = []):Promise<{val: string}[]> | undefined{
+        if (step.args){
+            const args = step.args;
+            
+            const arg = args[i];
+            if (arg.suggProvider !== ""){
+                return new Promise((resolve) => {
+                    if (i < 0 || i >= args.length){
+                        resolve([]);
+                    }
+                    else {
+                        fetch(`${AppConfig.getServerUrl()}/suggestion`, {
+                            method: "POST",
+                            body: JSON.stringify({
+                                step: step.pattern,
+                                args: stepArgs,
+                                argId: i
+                            })
+                        }).then((r => r.json())).then((suggs:string[]) => {
+                            console.log(suggs.map((v) => ({val: v})));
+                            resolve(suggs.map((v) => ({val: v})))
+                        })
+                    }
+                });
+            }
+        } else {
+            return undefined;
+        }
+    }
+
     fetchSteps(callback:(value?:Step[]) => void | undefined){
         fetch(`${AppConfig.getServerUrl()}/liststeps`).then((r) => r.json()).then((steps:Step[]) => {
             this.stepRepo = this.analyzeParams(steps);
