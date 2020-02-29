@@ -21,7 +21,7 @@
     "react-grid-layout": "^0.17.1",
     "react-monaco-editor": "^0.33.0",
     "react-resize-panel": "^0.3.5",
-    "react-scripts": "3.3.1",
+    "react-scripts": "3.4.0",
     "typescript": "~3.7.2"
   },
   "scripts": {
