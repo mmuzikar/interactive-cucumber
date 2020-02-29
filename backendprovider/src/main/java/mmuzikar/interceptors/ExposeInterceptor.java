@@ -22,7 +22,7 @@ public class ExposeInterceptor extends AbstractProcessor {
             annotatedElements.forEach(o ->{
                 switch (o.getKind()){
                     case METHOD:
-                        ExecutableType exec = ((ExecutableType) o);
+//                        ExecutableType exec = ((ExecutableType) o);
 
                         break;
                     case CLASS:
