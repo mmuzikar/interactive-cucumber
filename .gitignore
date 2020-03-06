@@ -135,3 +135,7 @@ dist
 .tern-port
 ui/old/
 .vscode/
+
+lib/**
+backendprovider/.factorypath
+testsuite/.factorypath

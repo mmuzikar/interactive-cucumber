@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Step as CStep } from "../interop/cucumberTypes";
+import { IStep as CStep } from "../interop/cucumberTypes";
 
 export class Step extends Component<CStep> {
     

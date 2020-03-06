@@ -1,5 +1,5 @@
 import { AppConfig } from "./config";
-import { Step } from "./cucumberTypes";
+import { Step, IStep } from "./cucumberTypes";
 import { Result, ResultType, HistoryResult } from "./feedback";
 import { Dispatcher } from "flux";
 import { HistoryManager } from "./historyManager";
@@ -29,30 +29,10 @@ export class StepManager {
         })
     }
 
-    analyzeParams(steps:Step[]){
-        return steps.map((step) => {
-            if (step.args){
-                let params = step.args;
-                let start = 0;
-                let end = 0;
-                let parN = 0;
-                for (let i = 1; i < step.pattern.length; i++){
-                    if (step.pattern[i] === '(' && step.pattern[i-1] !== '\\' && step.pattern[i+1] !== '?'){
-                        start = i;
-                    }
-                    if (step.pattern[i] === ')' && step.pattern[i-1] !== '\\'){
-                        end = i;
-                        params[parN].start = start;
-                        params[parN].end = end;
-                        parN++;
-                    }
-                }
-                return step;
-            } else {
-                return step;
-            }
-        })
+    getStepsSync():Step[]{
+        return this.stepRepo;
     }
+
 
     getSuggestionForArg(step:Step, i:number, stepArgs:string[] = []):Promise<{val: string}[]> | undefined{
         if (step.args){
@@ -73,7 +53,6 @@ export class StepManager {
                                 argId: i
                             })
                         }).then((r => r.json())).then((suggs:string[]) => {
-                            console.log(suggs.map((v) => ({val: v})));
                             resolve(suggs.map((v) => ({val: v})))
                         })
                     }
@@ -85,8 +64,8 @@ export class StepManager {
     }
 
     fetchSteps(callback:(value?:Step[]) => void | undefined){
-        fetch(`${AppConfig.getServerUrl()}/liststeps`).then((r) => r.json()).then((steps:Step[]) => {
-            this.stepRepo = this.analyzeParams(steps);
+        fetch(`${AppConfig.getServerUrl()}/liststeps`).then((r) => r.json()).then((steps:IStep[]) => {
+            this.stepRepo = steps.map(Step.fromIStep);
             if (callback){
                 callback(this.stepRepo);
             }

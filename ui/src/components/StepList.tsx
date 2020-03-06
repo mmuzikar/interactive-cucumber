@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Step as CStep } from "../interop/cucumberTypes";
+import { IStep as CStep } from "../interop/cucumberTypes";
 import { AppConfig } from "../interop/config";
 import { Step } from "./Step";
 import { Loading } from "./Loading";
@@ -12,7 +12,7 @@ type StepState = {
 export class StepList extends Component<{},StepState> {
 
     componentDidMount(){
-        StepManager.get().getSteps().then((steps) => this.setState({steps: steps}));
+        StepManager.get().getSteps().then((steps) => this.setState({steps: steps.map(step => step.toIStep())}));
     }
 
     render(){
