@@ -2,8 +2,6 @@ import { AppConfig } from "./config";
 import { Step, IStep } from "./cucumberTypes";
 import { Result, ResultType, HistoryResult } from "./feedback";
 import { Dispatcher } from "flux";
-import { HistoryManager } from "./historyManager";
-
 
 export class StepManager {
 
@@ -73,20 +71,19 @@ export class StepManager {
         })
     }
 
-    runStep(step: string) {
-        const id = HistoryManager.get().report({
-            status: ResultType.WAITING,
-            step: step,
-        });
-        fetch(`${AppConfig.getServerUrl()}/runstep`, {
-            body: step,
-            method: "POST",
-        }).then().then((res) => {
-            if (res.ok){
-                HistoryManager.get().reportForId(id, ResultType.SUCCESS);
-            } else {
-                HistoryManager.get().reportForId(id, ResultType.FAILURE);
-            }
-        });
+    runStep(step: string):Promise<ResultType> {
+        return new Promise((resolve) => {
+            fetch(`${AppConfig.getServerUrl()}/runstep`, {
+                body: step,
+                method: "POST",
+            }).then().then((res) => {
+                if (res.ok){
+                    resolve(ResultType.SUCCESS);
+                } else {
+                    resolve(ResultType.FAILURE);
+                }
+            });
+        })
+        
     }
 }

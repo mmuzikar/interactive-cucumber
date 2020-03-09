@@ -1,16 +1,29 @@
 import { CucumberService } from "./services/CucumberService";
 import { UnknownOpService } from "./services/UnknownOpService";
-import { Service, Model } from "./services/Service";
+import { Service, Model, ServiceResult } from "./services/Service";
+import { Dispatcher } from "flux";
+import { register } from "../editor/FeatureHighlight";
+
+export type Subscription = {
+    type: typeof Service, 
+    callback:(arg:ServiceResult) => void
+}
 
 export class Services {
 
-    services:Service[] = []
-    noopService:Service
+    services:Service<ServiceResult>[] = []
+    noopService:Service<ServiceResult>
     static instance:Services;
+    subscriptions:Subscription[] = [];
 
     constructor(){
         this.registerServices();
-        this.noopService = new UnknownOpService();
+        this.noopService = this.registerService(new UnknownOpService());
+    }
+
+    private registerService<T extends ServiceResult>(svc:Service<T>) : Service<T>{
+        this.services.push(svc);
+        return svc;
     }
 
     static get(){
@@ -21,8 +34,13 @@ export class Services {
     }
 
     registerServices(){
-        this.services.push(new CucumberService());
+        this.registerService(new CucumberService());
     }
+
+    getService(type : typeof Service): Service<any> | undefined {
+        return this.services.find(svc => svc instanceof type);
+    }
+
 
     evaluate(model:Model, from:number){
         const service = this.services.find(s => s.canHandleModel(model, from));

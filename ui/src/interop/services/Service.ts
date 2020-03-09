@@ -1,21 +1,21 @@
 import * as monaco from "monaco-editor";
 import { ResultType } from "../feedback";
+import { Dispatcher } from "flux";
 
 export type Model = monaco.editor.IModel;
 
-export type ServiceResult = {
-    ///Will map to different views i.e 0 - Output editor, 1 - log, 2 - console?
-    view: number,
-    result: string,
+export interface ServiceResult {
     status: ResultType,
-    data: any
+    data?: any,
 }
 
-export abstract class Service {
+export abstract class Service<T extends ServiceResult> {
+
+    dispatcher:Dispatcher<T> = new Dispatcher();
 
     abstract canHandle(line: string): boolean;
     //TODO maybe this should return some result?
-    abstract handle(model: Model, from: number): ServiceResult;
+    abstract handle(model: Model, from: number):ResultType;
 
     canHandleModel(model: Model, from: number): boolean {
         return this.canHandle(this.peek(model, from));
@@ -46,4 +46,5 @@ export abstract class Service {
     peek(model: Model, line: number = 1): string {
         return model.getLineContent(line);
     }
+
 }

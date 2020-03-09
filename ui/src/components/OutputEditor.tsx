@@ -1,16 +1,63 @@
 import React, { Component } from "react";
 import MonacoEditor from "react-monaco-editor";
 import * as monaco from "monaco-editor";
-import { HistoryManager, HistoryEntry } from "../interop/historyManager";
 import "../styles/outputEditor.css"
-
+import { Services } from "../interop/Services";
+import { CucumberService, CucumberServiceResult } from "../interop/services/CucumberService";
+import { ServiceResult } from "../interop/services/Service";
+import { ResultType } from "../interop/feedback";
+import { setPriority } from "os";
 type Props = {
 
 }
+enum Type {
+    STEP,
+    COMMENT,
+    GHERKINTEXT
+}
+
+type Line = {text:string, decorations?:monaco.editor.IModelDecorationOptions};
+
+interface EditorLine {
+    getLine():Line;
+}
+
+class Step implements EditorLine {
+    type : Type = Type.STEP;
+    constructor(public value:string, public id:number, public status:ResultType){}
+    getLine():Line{
+        return {
+            text: this.value,
+            decorations: {
+                isWholeLine: true,
+                glyphMarginClassName: `marginGlyphStatus-${this.status}`
+            }
+        }
+    }
+}
+class Comment implements EditorLine {
+    type : Type = Type.COMMENT;
+    constructor(public value:string){}
+    getLine():Line{
+        return {
+            text: this.value
+        }
+    }
+}
+class GherkinText implements EditorLine {
+    type : Type = Type.GHERKINTEXT;
+    constructor(public value:string, public keyword:string){}
+    getLine():Line{
+        return {
+            text: `${this.keyword}: ${this.value}`
+        }
+    }
+}
+type Entry = Step | Comment | GherkinText; 
 
 type State = {
     editor: monaco.editor.IStandaloneCodeEditor,
-    history: HistoryEntry[]
+    steps: Entry[]
 }
 
 export class OutputEditor extends Component<Props, State> {
@@ -22,44 +69,45 @@ export class OutputEditor extends Component<Props, State> {
     constructor(props:Props){
         super(props);
         this.mountEditor = this.mountEditor.bind(this);
-        HistoryManager.get().historyDispatcher.register((entry) => {
-            this.setState((prev) => {
-                if (!prev.history){
-                    return {
-                        history: []
-                    }
-                }
-                const history = prev.history;
-                history[entry.id] = entry;
-                return {
-                    history: history
-                }
-            }, this.refreshValue)
+        this.setText = this.setText.bind(this);
+        this.cucumberResult = this.cucumberResult.bind(this);
+    }
+
+    cucumberResult(result:CucumberServiceResult){
+        const step = this.state.steps.find(step => step instanceof Step && step.id === result.id);
+        if (step){
+            let steps = this.state.steps;
+            const i = steps.findIndex(s => s === step);
+            let s = steps[i] as Step;
+            s.status = result.status;
+            this.setState({
+                steps: steps
+            })
+        } else {
+            this.setState((old) => ({
+                steps: [...old.steps, new Step(result.stepVal, result.id, result.status)]
+            }));
+            console.debug(result);
+        }
+        this.forceUpdate();
+    }
+
+    componentDidMount(){
+        this.setState({
+            steps: [
+                new GherkinText("$feature", "Feature"),
+                new GherkinText("$scenario", "Scenario")
+            ]
         })
+        const svc = Services.get().services.find(svc => svc instanceof CucumberService) as CucumberService;
+        if (svc){
+            svc.dispatcher.register(this.cucumberResult);
+        }
     }
 
     oldDecorations:string[]= [];
 
     refreshValue(){
-        const {editor} = this.state;
-        const history = HistoryManager.get().history;
-        const newVal = history.map(entry => 
-            entry.step
-        ).join("\n");
-        editor.setValue(newVal);
-        const newDecorations = history.map((val, i) => ({
-            range: new monaco.Range(i + 1, 1, i + 1, 1),
-            options: {
-                isWholeLine: true,
-                glyphMarginClassName: `marginGlyphStatus-${val.status}`,
-
-            }
-        }));
-        console.debug(history);
-        console.debug(newDecorations);
-        if (newDecorations){
-            this.oldDecorations = editor.deltaDecorations(this.oldDecorations, newDecorations);
-        }
 
     }
 
@@ -86,8 +134,38 @@ export class OutputEditor extends Component<Props, State> {
         monaco.editor.setTheme('output-theme');
     }
 
+    setText(){
+        if (!this.state)
+            return;
+        let indent = 0;
+        const src : string[] = [];
+        this.state.steps.forEach(val => {
+            src.push('\t'.repeat(indent) + val.getLine().text);
+            if (val instanceof GherkinText){
+                indent += 1;
+            }
+        });
+        this.state.editor.setValue(src.join("\n"));
+        let line = 1;
+        let decorations : monaco.editor.IModelDeltaDecoration[] = [];
+        this.state.steps.forEach((val) => {
+            const l = val.getLine()
+            const deco = l.decorations;
+            const length = l.text.split("\n").length;
+            if (deco){
+                decorations.push({
+                    range: new monaco.Range(line, 0, line + length, 0),
+                    options: deco
+                })
+            }
+            line += length;
+        })
+        this.state.editor.deltaDecorations(this.oldDecorations, decorations);
+    }
+
 
     render(){
+        this.setText();
         return <MonacoEditor editorDidMount={this.mountEditor} options={this.config}/>
     }
 }

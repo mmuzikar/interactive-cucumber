@@ -6,8 +6,6 @@ import {  } from "react-grid-layout";
 import RGL, { WidthProvider, Layout } from "react-grid-layout";
 import { StepList } from './components/StepList';
 import { TerminalInput } from './components/TerminalInput';
-import { History } from './components/History';
-import { Editor } from './components/Editor';
 import { InputEditor } from './components/InputEditor';
 import { OutputEditor } from './components/OutputEditor';
 
