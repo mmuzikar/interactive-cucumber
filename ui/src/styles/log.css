@@ -1,0 +1,35 @@
+.logger-error {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.logger-warn {
+    color: #d46708;
+}
+
+.logger-info {
+    color: #3dbf62;
+}
+
+.logger-debug {
+    color: #3dbf62;
+}
+
+.logger-std {
+    color: #3dbf62;
+}
+
+.logger-stderr {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+#logger {
+    overflow: scroll;
+    height: inherit;
+    border-top: 2px solid #cccccc;
+}
+
+#logger > h3 {
+    display: inline;
+}

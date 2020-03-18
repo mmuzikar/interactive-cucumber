@@ -36,7 +36,6 @@ public class RunStepHandler implements Handler {
             sendResponse(exchange, "Wrong params", 500);
             return;
         }
-        log.info("Args: " + args);
         try {
             matchedSteps.get(0).getOrigStepDef().execute("en", args.stream().map(Argument::getVal).toArray());
         } catch (Throwable e) {

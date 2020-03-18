@@ -1,0 +1,10 @@
+.marginGlyphStatus-success{
+    background: #00ff00;
+}
+.marginGlyphStatus-waiting{
+    background: orange;
+}
+
+.marginGlyphStatus-failure{ 
+    background: #ff0000;
+}
