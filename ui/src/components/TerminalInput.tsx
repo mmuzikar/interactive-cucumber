@@ -2,14 +2,14 @@ import React, { Component, ChangeEvent } from "react";
 import { CompletePrompt } from "./CompletePrompt";
 import { StepManager } from "../interop/stepManager";
 import { Dispatcher } from "flux";
-import { Step, Argument } from "../interop/cucumberTypes";
+import { IStep, Argument, Step } from "../interop/cucumberTypes";
 
 export const keyDispatcher = new Dispatcher<React.KeyboardEvent>();
 
 type State = {
     val:string, 
     canSend:boolean, 
-    stepRef?: Step,
+    stepRef?: IStep,
     parsedInput: (string | number)[]
 };
 
@@ -49,7 +49,7 @@ export class TerminalInput extends Component<{}, State> {
     }
 
     getStepRef(){
-        return this.state.stepRef! as Step;
+        return this.state.stepRef! as IStep;
     }
 
     handleInput(input:React.KeyboardEvent<HTMLInputElement>){
@@ -111,15 +111,16 @@ export class TerminalInput extends Component<{}, State> {
     onSetStep(step: Step){
         let split = [];
         if (step && step.args){
-            split.push(step.pattern.substring(0, step.args[0].start!));
+            const source = step.pattern.source;
+            split.push(source.substring(0, step.args[0].start!));
             split.push(0);
             for (let i = 1; i < step.args.length; i++){
-                split.push(step.pattern.substring(step.args[i-1].end! + 1, step.args[i].start!));
+                split.push(source.substring(step.args[i-1].end! + 1, step.args[i].start!));
                 split.push(i);
             }
-            split.push(step.pattern.substring(step.args[step.args.length - 1].end! + 1));
+            split.push(source.substring(step.args[step.args.length - 1].end! + 1));
         }
-        this.setState({val: step ? step.pattern : "", parsedInput: split, stepRef: step}, () => {
+        this.setState({val: step ? step.pattern.source : "", parsedInput: split, stepRef: step.toIStep()}, () => {
             if (step && step.args){
                 const firstInput = document.getElementById('arg-0') as HTMLInputElement;
                 if (firstInput){

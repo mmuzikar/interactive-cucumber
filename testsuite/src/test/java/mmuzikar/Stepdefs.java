@@ -1,6 +1,8 @@
 package mmuzikar;
 
 import com.codeborne.selenide.Selenide;
+
+import cucumber.api.DataTable;
 import cucumber.api.java.en.When;
 import lombok.extern.java.Log;
 import org.junit.Assert;
@@ -10,6 +12,8 @@ import mmuzikar.suggestions.InputSuggestion;
 import mmuzikar.suggestions.LinkTextSuggestion;
 
 import static com.codeborne.selenide.Selenide.$;
+
+import java.util.Map;
 
 @Log
 public class Stepdefs {
@@ -35,5 +39,13 @@ public class Stepdefs {
     @When("click on link \"([^\"]*)\"")
     public void clickOnLink(@Suggestion(LinkTextSuggestion.class) String linkText){
         $(By.linkText(linkText)).click();
+    }
+
+    @When("fill form named \"([^\"]*)\"")
+    public void tableUsage(String str, DataTable table){
+        Map<String, String> formData = table.asMap(String.class, String.class);
+        formData.entrySet().forEach(entry -> {
+            $(By.id(str)).$(By.name(entry.getKey())).setValue(entry.getValue());
+        });
     }
 }

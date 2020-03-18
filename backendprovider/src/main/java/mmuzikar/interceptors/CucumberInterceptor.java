@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
@@ -15,7 +16,7 @@ import mmuzikar.AgentConfiguration;
 import mmuzikar.handlers.Handlers;
 import mmuzikar.processors.StepDefProcessor;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.List;

@@ -27,3 +27,11 @@
     content: ">";
     color: blue;
 }
+
+
+.marginGlyphStatus-success{
+    background: '00ff00'
+}
+.marginGlyphStatus-failure{ 
+    background: 'ff0000'
+}
