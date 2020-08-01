@@ -30,6 +30,9 @@ type State = {
     follow: boolean
 }
 
+/** 
+ * The log component bellow the editors
+*/
 export class Logger extends Component<{}, State> {
 
     timerId: number | undefined;
@@ -51,6 +54,7 @@ export class Logger extends Component<{}, State> {
         follow: true
     }
 
+    //Calls to the backend to obtain latest logs
     refresh() {
         fetch(`${AppConfig.getServerUrl()}/log`).then(resp => resp.json()).then((data: LogData) => {
             if (data.json.length > 0 || data.stderr.length > 0 || data.stdout.length > 0) {

@@ -1,6 +1,7 @@
 import { Service, Model, ServiceResult } from "./Service";
 import { ResultType } from "../feedback";
 
+//Just consumes the line if no other service can handle this line
 export class UnknownOpService extends Service<ServiceResult> {
     canHandle(line: string): boolean {
         return true;

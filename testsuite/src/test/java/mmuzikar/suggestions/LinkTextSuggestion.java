@@ -9,10 +9,11 @@ import java.util.stream.Collectors;
 
 import static com.codeborne.selenide.Selenide.$$;
 
+//Provides suggestions for every link text on the page
 public class LinkTextSuggestion implements ISuggestionProvider {
 
     @Override
-    public List<Object> provide(String step, Object[] params) {
+    public List<Object> provide(String step) {
         return $$(By.tagName("a")).stream().map(SelenideElement::text).collect(Collectors.toList());
     }
 }

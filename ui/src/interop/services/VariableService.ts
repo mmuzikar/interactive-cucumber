@@ -1,6 +1,7 @@
 import { Service, Model, ServiceResult } from "./Service";
 import { ResultType } from "../feedback";
 
+//Allows to register variables a constant value
 export class VariableService extends Service<ServiceResult> {
     
     VARIABLE_STATEMENT = /(\w+):\s*(.*)$/;

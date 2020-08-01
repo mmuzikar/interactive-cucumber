@@ -2,6 +2,9 @@ package mmuzikar;
 
 import lombok.extern.java.Log;
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 import mmuzikar.interceptors.CucumberInterceptor;
@@ -18,28 +21,20 @@ public class ByteBuddyHandler {
 
     public void registerTransformations(Instrumentation instrumentation) {
         log.info("AGENT INSTALLED");
-        /*
-        new AgentBuilder.Default()
-//                .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
-                .type(ElementMatchers.named("mmuzikar.TestObject"))
-                .transform((builder, typeDescription, classLoader, module) ->
-                        builder.method(ElementMatchers.isToString())
-                                .intercept(MethodDelegation.to(TestInterceptor.class))
-                                .defineField("injectedField", Object.class, Modifier.PUBLIC | Modifier.STATIC)
-                ).installOn(instrumentation);
-
-         */
+        //Instruct childrenInvoker method to call one from CucumberInterceptor instead
         new AgentBuilder.Default()
                 .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
                 .with(AgentBuilder.InjectionStrategy.UsingReflection.INSTANCE)
-                //.with(AgentBuilder.Listener.StreamWriting.toSystemError())
-                .type(ElementMatchers.named("cucumber.api.junit.Cucumber"))
+                .with(AgentBuilder.Listener.StreamWriting.toSystemError().withErrorsOnly())
+                .type(ElementMatchers.named("cucumber.api.junit.Cucumber").or(ElementMatchers.named("io.cucumber.junit.Cucumber")))
                 .transform((builder, typeDescription, classLoader, module) -> {
                     log.info("Transforming: " + typeDescription.getName());
                     return builder.method(ElementMatchers.named("childrenInvoker"))
-                            .intercept(MethodDelegation.to(CucumberInterceptor.class));
+                            .intercept(MethodDelegation.to(CucumberInterceptor.class))
+                            .visit(Advice.to(CucumberInterceptor.class).on(ElementMatchers.isConstructor()));
                 }).installOn(instrumentation);
-/*
+        //Leftover Expose tries
+        /*
         new AgentBuilder.Default()
                 .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
                 .with(AgentBuilder.InjectionStrategy.UsingReflection.INSTANCE)
@@ -62,7 +57,7 @@ public class ByteBuddyHandler {
                     return builder.constructor(ElementMatchers.any())
                             .intercept(MethodDelegation.to(ExposeInterceptor.class));
                 }).installOn(instrumentation);
-*/
+        */
     }
 
 }

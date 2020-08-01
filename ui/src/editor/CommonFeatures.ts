@@ -7,6 +7,8 @@ import { OutputEditor } from "../components/OutputEditor";
 export const INPUT_ID = "feature";
 export const OUTPUT_ID = "feature-output";
 
+//Utility file for registering different functionality to the editors
+
 export function registerCommonExtensions(){
     registerFeatureLang();
 }

@@ -2,6 +2,7 @@ import * as monaco from "monaco-editor";
 import { languages, editor } from "monaco-editor"
 import { StepManager } from "../interop/stepManager";
 import { INPUT_ID, OUTPUT_ID } from "./CommonFeatures";
+import { Services } from "../interop/Services";
 
 export function register(){
     languages.register({id: INPUT_ID});
@@ -51,24 +52,9 @@ function registerLexer(id: string){
 function registerProvider(){
     languages.registerCompletionItemProvider(INPUT_ID, {
         async provideCompletionItems(model: editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken){
-            const steps = await StepManager.get().getSteps();
-            const word = model.getWordUntilPosition(position);
-            const range : monaco.IRange = {
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: word.startColumn,
-                endColumn: word.endColumn
-            }
+            const items = await Services.get().provideSuggestions(model, position, context);
             const suggestions: monaco.languages.CompletionList = {
-                suggestions: [
-                    ...steps.map((step) => ({
-                        label: step.pattern.source,
-                        kind: languages.CompletionItemKind.Function,
-                        insertText: step.getPlaceholderText(),
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        range: range
-                    }))
-                ]
+                suggestions: items
             }
             return suggestions;
         }

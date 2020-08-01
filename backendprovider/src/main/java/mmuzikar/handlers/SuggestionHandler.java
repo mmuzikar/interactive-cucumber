@@ -1,22 +1,21 @@
 package mmuzikar.handlers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import gherkin.deps.com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import mmuzikar.api.ISuggestionProvider;
-import mmuzikar.data.StepDefPOJO;
-import mmuzikar.processors.StepDefProcessor;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static mmuzikar.handlers.Handler.getRequestBody;
 
+//Provides suggestions for suggestion provider indicated by classname in the request body
 public class SuggestionHandler implements Handler {
 
+    //Cache or instanciated suggestion providers
     private Map<String, ISuggestionProvider> providers;
 
     public SuggestionHandler() {
@@ -27,30 +26,23 @@ public class SuggestionHandler implements Handler {
     public void handle(HttpExchange exchange) throws IOException {
         String body = getRequestBody(exchange);
         SuggestionRequest req = new Gson().fromJson(body, SuggestionRequest.class);
-        Optional<StepDefPOJO> stepdef = StepDefProcessor.getStepDefs().stream().filter(def -> req.step.equals(def.getPattern())).findFirst();
-        if (!stepdef.isPresent()){
-            Handler.sendResponse(exchange, "No step definition found");
-            return;
-        }
-        StepDefPOJO def = stepdef.get();
-        String suggId = def.getArgs()[req.argId].getSuggProvider();
-        if (providers.get(suggId) == null){
+        if (providers.get(req.providerType) == null) {
             try {
-                providers.put(suggId, ((ISuggestionProvider) Class.forName(suggId).newInstance()));
-            } catch (Exception e) {
-                e.printStackTrace();
+                Class<? extends ISuggestionProvider> clazz = Class.forName(req.providerType).asSubclass(ISuggestionProvider.class);
+                providers.put(req.providerType, clazz.asSubclass(ISuggestionProvider.class).newInstance());
+            } catch (Throwable t) {
+                Handler.sendResponse(exchange, "No suggestion provider of type " + req.providerType + "found", 404);
             }
         }
-        ISuggestionProvider provider = providers.get(suggId);
-        List<Object> suggestions = provider.provide(req.step, req.args, req.argId);
+        ISuggestionProvider provider = providers.get(req.providerType);
+        List<Object> suggestions = provider.provide(req.stepVal, req.argId);
         Handler.sendResponse(exchange, new Gson().toJson(suggestions));
     }
 
     @AllArgsConstructor
     private static final class SuggestionRequest {
-
-        public final String step;
-        public final Object[] args;
+        public final String providerType;
+        public final String stepVal;
         public final int argId;
     }
 }

@@ -10,6 +10,7 @@ type StepState = {
     search: string
 }
 
+//The step list used for searching in step definitions
 export class StepList extends Component<{},StepState> {
 
     constructor(props:any){
@@ -50,10 +51,10 @@ export class StepList extends Component<{},StepState> {
                 const fuse = new Fuse<CStep, Fuse.FuseOptions<CStep>>(this.state.steps, this.searchOptions);
                 steps = fuse.search(this.state.search) as CStep[];
             }
-            return (<div style={{paddingRight: "10px"}}>
+            return (<div style={{paddingRight: "10px", height: 'inherit'}}>
                 <h3>Step list</h3>
                 <input onChange={this.filter} placeholder="Filter" style={{width: "100%"}}/>
-                <ul>
+                <ul style={{height: '80%', overflowY: 'scroll'}}>
                     {
                         steps.length != 0 ? 
                             steps.map((val : CStep, i : number) => <Step {...val} key={`step_${i}`}/>)

@@ -7,6 +7,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+    Expose annotation was meant to be used as a way to providing
+    interoperability between the UI and the Java test suite. 
+    It proved to be more difficult, see ExposeInterceptor for annotation processor skeleton
+    in ExposeProcessor all exposed instances (be it objects, methods etc.) would reside. 
+*/
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Expose {

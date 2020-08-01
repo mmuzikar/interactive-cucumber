@@ -13,6 +13,9 @@ type State = {
     parsedInput: (string | number)[]
 };
 
+/*  Old terminal input style... is not used in the application but you can 
+    clearly see why it was so much code to implement very little functionality
+*/
 export class TerminalInput extends Component<{}, State> {
 
     constructor(props:any){

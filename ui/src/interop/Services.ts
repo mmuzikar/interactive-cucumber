@@ -3,6 +3,8 @@ import { UnknownOpService } from "./services/UnknownOpService";
 import { Service, Model, ServiceResult } from "./services/Service";
 import { CommentService } from "./services/CommentService";
 import { VariableService } from "./services/VariableService";
+import { editor } from "monaco-editor";
+import * as monaco from "monaco-editor";
 
 export type Subscription = {
     type: typeof Service, 
@@ -43,6 +45,14 @@ export class Services {
         return this.services.find(svc => svc instanceof type);
     }
 
+    async provideSuggestions(model: editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext) : Promise<monaco.languages.CompletionItem[]> {
+        let sugs : monaco.languages.CompletionItem[] = [];
+        const serviceResults = this.services
+            .map(svc => svc.provideSuggestions(model, position, context));
+        const items = await Promise.all(serviceResults);
+        items.forEach(val => val.forEach(s => sugs.push(s)));
+        return sugs;
+    }
 
     evaluate(model:Model, from:number){
         const service = this.services.find(s => s.canHandleModel(model, from));

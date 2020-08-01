@@ -1,6 +1,7 @@
 import { Service, ServiceResult, Model } from "./Service";
 import { ResultType } from "../feedback";
 
+//Consumes comment and adds it to the output
 export class CommentService extends Service<ServiceResult> {
     canHandle(line: string): boolean {
         return line.trim().startsWith("#");

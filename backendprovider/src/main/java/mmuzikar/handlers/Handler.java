@@ -6,14 +6,18 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+//General interface for any handler 
 public interface Handler {
 
+    //gets called when a request to the path is made
     void handle(HttpExchange exchange) throws IOException;
 
+    //returns path that should be registered for this handler
     default String getPath() {
         return "/" + getClass().getSimpleName().toLowerCase().replace("handler", "");
     }
 
+    //==== utility functions ====
     static String getRequestBody(HttpExchange exchange) throws IOException {
         return IOUtils.toString(exchange.getRequestBody(), Charset.defaultCharset());
     }
