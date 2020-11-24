@@ -1,6 +1,7 @@
 import { Step } from "./cucumberTypes";
 import { StepManager } from "./stepManager";
 
+//Cucumber utility class
 export class Cucumber {
 
     public static DATATABLE_TYPE = "cucumber.api.DataTable";

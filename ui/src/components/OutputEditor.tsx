@@ -66,6 +66,7 @@ type State = {
     steps: Entry[]
 }
 
+//Output editor for displaying the results of current scenario
 export class OutputEditor extends Component<Props, State> {
 
     config : monaco.editor.IEditorConstructionOptions = {
@@ -99,7 +100,7 @@ export class OutputEditor extends Component<Props, State> {
             })
         } else {
             this.setState((old) => ({
-                steps: [...old.steps, new Step(result.stepVal, result.id, result.status)]
+                steps: [...old.steps, new Step(result.data, result.id, result.status)]
             }));
         }
         this.forceUpdate();
@@ -148,6 +149,7 @@ export class OutputEditor extends Component<Props, State> {
         })
     }
 
+    //Remove failed steps before exporting
     export(){
         this.setState(old => (
             {

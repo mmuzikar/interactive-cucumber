@@ -10,9 +10,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ExecutableType;
 import java.util.Set;
 
-@SupportedAnnotationTypes("mmuzikar.api.Expose")
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
-@AutoService(Processor.class)
+/**
+ * Annotation processor handling the exposing process
+ * As you can see it is not implemented
+ * handling the different kinds would be a lot of time for a secondary feature.
+ * the objects are not exposed to outside of this agent
+ */
 public class ExposeInterceptor extends AbstractProcessor {
 
     @Override

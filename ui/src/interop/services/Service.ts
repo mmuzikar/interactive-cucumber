@@ -14,8 +14,10 @@ export abstract class Service<T extends ServiceResult> {
     dispatcher:Dispatcher<T> = new Dispatcher();
 
     abstract canHandle(line: string): boolean;
-    //TODO maybe this should return some result?
     abstract handle(model: Model, from: number):ResultType;
+    async provideSuggestions(model:Model, position: monaco.Position, context: monaco.languages.CompletionContext) : Promise<monaco.languages.CompletionItem[]>{
+        return Promise.resolve([]);
+    }
 
     canHandleModel(model: Model, from: number): boolean {
         return this.canHandle(this.peek(model, from));

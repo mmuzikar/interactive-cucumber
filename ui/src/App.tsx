@@ -9,6 +9,7 @@ import { OutputEditor } from './components/OutputEditor';
 import { Logger } from './components/Log';
 import { Toolbox } from './components/Toolbox';
 
+//Grid layout for the different components
 const ReactGridLayout = WidthProvider(RGL);
 const layout : Layout[] = [
   {i: "input-editor", x: 0, y: 0, w: 4, h: 6},

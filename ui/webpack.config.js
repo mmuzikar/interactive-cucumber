@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 
 // const MonacoEditorSrc = path.join(__dirname, "..", "src");
-
+// common webpack config for building the frontend
 module.exports = {
   entry: "./src/index.tsx",
   output: {

@@ -2,11 +2,13 @@ package mmuzikar.handlers;
 
 import lombok.Getter;
 
+/**
+ * Public handlers to provide resources to the ui
+ */
 public enum Handlers {
 
     RUN_STEP(new RunStepHandler()),
     LIST_STEPS(new ListStepsHandler()),
-    ADD_STEP(new AddStepHandler()),
     SUGGEST(new SuggestionHandler()),
     LOG(new LogHandler());
 

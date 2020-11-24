@@ -17,6 +17,7 @@ type State<T> = {
     currentIndex: number
 };
 
+//Part of terminal input leftover code, monaco editor handles this by itself
 export class CompletePrompt<T> extends Component<Props<T>, State<T>> {
 
     fuseOptions : FuseOptions<T> = {

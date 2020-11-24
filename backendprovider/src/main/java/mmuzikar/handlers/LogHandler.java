@@ -1,7 +1,7 @@
 package mmuzikar.handlers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import gherkin.deps.com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.output.TeeOutputStream;
@@ -22,6 +22,9 @@ public class LogHandler implements Handler {
     private ByteArrayOutputStream outputErrorStream;
     private List<LogRecord> records;
 
+    /**
+     * Copy std outputs locally to send them over to the frontend
+     */
     private void setupStdOutput(){
         outputCopyStream = new ByteArrayOutputStream(1000);
         outputErrorStream = new ByteArrayOutputStream(1000);
@@ -33,6 +36,7 @@ public class LogHandler implements Handler {
         System.setErr(errorPrint);
     }
 
+    // Add logger to the root logger to catch all logs
     private void setupLoggers(){
         Logger global = Logger.getGlobal();
         while (global.getParent() != null){
@@ -72,6 +76,7 @@ public class LogHandler implements Handler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
+            //Send over any logs
             LogPojo log = new LogPojo(records, outputCopyStream.toString(), outputErrorStream.toString());
             Handler.sendResponse(exchange, new Gson().toJson(log));
             records.clear();
