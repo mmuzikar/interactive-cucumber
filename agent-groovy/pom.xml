@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Generated from archetype; please customize.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>interactive-cucumber</artifactId>
+		<groupId>com.github.mmuzikar</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>agent-groovy</artifactId>
+	<name>Interactive cucumber agent</name>
+	<version>1.0-SNAPSHOT</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>${groovy.version}</version>
+			<type>pom</type>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-gherkin</artifactId>
+			<version>6.2.2</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-core</artifactId>
+			<version>6.2.2</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.27.0-GA</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.mmuzikar</groupId>
+			<artifactId>interactive-cucumber-api</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.github.therapi</groupId>
+			<artifactId>therapi-runtime-javadoc-scribe</artifactId>
+			<version>0.12.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.therapi</groupId>
+			<artifactId>therapi-runtime-javadoc</artifactId>
+			<version>0.12.0</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>${gmaven.plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.gmavenplus</groupId>
+				<artifactId>gmavenplus-plugin</artifactId>
+				<version>${gmaven-plus.plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>addSources</goal>
+							<goal>addTestSources</goal>
+							<goal>generateStubs</goal>
+							<goal>compile</goal>
+							<goal>generateTestStubs</goal>
+							<goal>compileTests</goal>
+							<goal>removeStubs</goal>
+							<goal>removeTestStubs</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven.jar.plugin.version}</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<addClasspath>true</addClasspath>
+							<Premain-Class>com.github.mmuzikar.Main</Premain-Class>
+							<Can-Retransform-Classes>true</Can-Retransform-Classes>
+							<Can-Redefine-Classes>true</Can-Redefine-Classes>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.4</version>
+				<configuration>
+					<relocations>
+						<!--                        <relocation>-->
+						<!--                            <pattern>groovy</pattern>-->
+						<!--                            <shadedPattern>shaded.groovy</shadedPattern>-->
+						<!--                        </relocation>-->
+						<!--                        <relocation>-->
+						<!--                            <pattern>org.apache.groovy</pattern>-->
+						<!--                            <shadedPattern>shaded.apache.groovy</shadedPattern>-->
+						<!--                        </relocation>-->
+						<!--                        <relocation>-->
+						<!--                            <pattern>org.codehaus.groovy</pattern>-->
+						<!--                            <shadedPattern>shaded.codehaus.groovy</shadedPattern>-->
+						<!--                        </relocation>-->
+						<!--                        <relocation>-->
+						<!--                            <pattern>net.bytebuddy</pattern>-->
+						<!--                            <shadedPattern>shaded.net.bytebuddy</shadedPattern>-->
+						<!--                        </relocation>-->
+					</relocations>
+					<artifactSet>
+						<includes>
+<!--							<include>com.github.mmuzikar:interactive-cucumber-ui</include>-->
+							<include>org.codehaus.groovy:*</include>
+							<include>net.bytebuddy:*</include>
+							<include>org.javassist:*</include>
+						</includes>
+					</artifactSet>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>standalone</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.github.mmuzikar</groupId>
+					<artifactId>interactive-cucumber-ui</artifactId>
+					<version>1.0-SNAPSHOT</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-ui</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/target/classes/ui/</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${basedir}/../interactive-cucumber-ui/build/</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

@@ -1,0 +1,81 @@
+.grid-item {
+  height: 100%;
+}
+
+.step-failed {
+  color: #bb0523;
+}
+
+.step-failed:hover,.step-passed:hover {
+  text-decoration: line-through;
+  cursor: pointer;
+}
+
+.step-passed {
+  color: #39a70c;
+}
+
+.step-failed::before {
+  content: '✗';
+  padding-right: 8px;
+  color: #bb0523;
+}
+
+.step-passed::before {
+  content: '✓';
+  padding-right: 8px;
+  color: #39a70c;
+}
+
+.step-running {
+  color: #e89617;
+}
+
+.step-running::before {
+  content: '▶';
+  padding-right: 8px;
+  color: #e89617
+}
+
+.step-scheduled {
+  color: #b3b9af;
+}
+
+.step-scheduled::before {
+  content: '⏱';
+  padding-right: 8px;
+  color: #b3b9af;
+}
+
+.output-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.output-list li {
+  padding-left: 16px;
+}
+
+.align-right {
+  position: absolute;
+  right: 0px;
+  padding-right: 10px;
+}
+
+.code-text {
+  font-family: monospace;
+  font-size-adjust: 0.7;
+}
+
+.log-info {
+  color: #39a70c;
+}
+
+.log-warning {
+  color: #ccaa00;
+}
+
+.log-error {
+  color: #bb0523;
+}
