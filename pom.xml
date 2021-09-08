@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <groupId>com.github.mmuzikar</groupId>
-    <artifactId>interactive-cucumber</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.mmuzikar</groupId>
+	<artifactId>interactive-cucumber</artifactId>
 
-    <modules>
-        <module>agent-groovy</module>
-        <module>interactive-cucumber-api</module>
-        <module>interactive-cucumber-ui</module>
-        <!-- Tests should be executed from their own dir (for the agent path to be correct) -->
-        <!--        <module>tests</module>-->
-    </modules>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.version>1.0-SNAPSHOT</project.version>
+	<modules>
+		<module>agent-groovy</module>
+		<module>interactive-cucumber-api</module>
+		<module>interactive-cucumber-ui</module>
+		<module>tests</module>
+	</modules>
 
-        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-        <maven.jar.plugin.version>3.2.0</maven.jar.plugin.version>
-        <maven.resources.plugin.version>3.2.0</maven.resources.plugin.version>
-        <gmaven.plugin.version>2.1.1</gmaven.plugin.version>
-        <gmaven-plus.plugin.version>1.12.1</gmaven-plus.plugin.version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.version>1.0-SNAPSHOT</project.version>
+		<maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+		<maven.jar.plugin.version>3.2.0</maven.jar.plugin.version>
+		<maven.resources.plugin.version>3.2.0</maven.resources.plugin.version>
+		<gmaven.plugin.version>2.1.1</gmaven.plugin.version>
+		<gmaven-plus.plugin.version>1.12.1</gmaven-plus.plugin.version>
+		<groovy.version>3.0.8</groovy.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
 
-        <groovy.version>3.0.8</groovy.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
 </project>

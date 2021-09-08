@@ -172,6 +172,9 @@
 	<profiles>
 		<profile>
 			<id>standalone</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>com.github.mmuzikar</groupId>
