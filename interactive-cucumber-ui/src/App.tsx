@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { CucumberContext, CucumberContextType } from './data/CucumberContext';
-import { useAsync, useAsyncRetry } from 'react-use';
+import { useAsyncRetry } from 'react-use';
 import { InputEditor } from './components/InputEditor';
 import { Log } from './components/Log';
 import { Toolbox } from './components/Toolbox';
@@ -10,7 +10,7 @@ import "react-grid-layout/css/styles.css";
 import 'react-resizable/css/styles.css';
 import useWindowDimensions from './hooks/WindowDimensions';
 import { Output } from './components/Output';
-import { AlertProviderProps, Provider as AlertProvider } from 'react-alert';
+import { Provider as AlertProvider } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic'
 
 const layout: GridLayout.Layout[] = [
@@ -34,11 +34,11 @@ export const App = () => {
       <strong>{context.error.name}</strong>
       <p>{context.error.message}</p>
       <p>Please check your testsuite, is it running? Have you tried turning it off and on?</p>
-      <a onClick={() => context.retry()} href="javascript:void(0)">Reload</a>
+      <button onClick={() => context.retry()}>Reload</button>
     </div>;
   } else if (context.value) {
     content = <CucumberContext.Provider value={context.value}>
-      <GridLayout layout={layout} className="layout" cols={12} width={width} rowHeight={(height - 50) / 3}>
+      <GridLayout draggableHandle='.draggable' layout={layout} className="layout" cols={12} width={width} rowHeight={(height - 50) / 3}>
         <div key='input'><InputEditor /></div>
         <div key='output'><Output /></div>
         <div key='log'><Log /></div>

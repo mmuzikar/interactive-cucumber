@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import { useAlert } from "react-alert"
 import { useMount, useUpdate } from "react-use"
-import { fetchAPI, postApi } from "../config/Utils"
+import { postApi } from "../config/Utils"
 import { CucumberContext } from "../data/CucumberContext"
 import { withLineBreaks } from "../utils/textutils"
 
@@ -70,7 +70,7 @@ export const Output = () => {
             content: cucumber.currentScenario.getText()
         }))
         clear()
-        alert.info('Saved!')
+        alert.info(`Saved at uri: ${uri}`)
 
     }
 

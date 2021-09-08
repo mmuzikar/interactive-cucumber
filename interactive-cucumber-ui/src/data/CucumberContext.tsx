@@ -4,7 +4,6 @@ import { fetchAPI, postApi } from "../config/Utils";
 import Parser from "gherkin/dist/src/Parser";
 import AstBuilder from "gherkin/dist/src/AstBuilder";
 import * as messages from "@cucumber/messages";
-import { TaskQueue } from 'ts-async-queue';
 import Queue from "queue";
 
 export type Argument = (RegexArgument | GherkinArgument) & {
@@ -143,6 +142,13 @@ export class Feature {
     source: string
     uri: string
 
+    readonly name?: string
+    readonly tags?: string[]
+
+    readonly description?: string;
+
+    scenarios?: Scenario[]
+
     static featureId: number = 0
     static parser = new Parser(new AstBuilder(messages.IdGenerator.incrementing()))
 
@@ -182,13 +188,6 @@ export class Feature {
             this.parsedFeature = document.feature;
         }
     }
-
-    readonly name?: string
-    readonly tags?: string[]
-
-    readonly description?: string;
-
-    scenarios?: Scenario[]
 }
 
 export class Scenario {
@@ -345,7 +344,7 @@ class EditableScenario {
 ${this._tags}
 Scenario: ${this.name}
 ${this._steps.map(step => '\t' + step.text).join('\n')}
-        `)
+        `.trim())
     }
 
 

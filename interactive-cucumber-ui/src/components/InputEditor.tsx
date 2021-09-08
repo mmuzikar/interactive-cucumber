@@ -1,6 +1,6 @@
 import Editor, { OnMount } from "@monaco-editor/react";
-import { CancellationToken, editor, languages, Position, Selection, Range } from "monaco-editor";
-import React, { useContext, useRef, useState } from "react";
+import { CancellationToken, editor, languages, Position, Range } from "monaco-editor";
+import { useContext, useRef } from "react";
 import { useAlert } from "react-alert";
 import { useEffectOnce } from "react-use";
 import { CucumberContext } from "../data/CucumberContext";
@@ -10,10 +10,18 @@ import { initServices, ServiceManager } from "../services/Service";
 const INPUT_LANG_ID = "feature"
 export const STEP_PATTERN = /(?:Given|When|Then|And|But)\s(.*)/;
 
+const DEFAULT_TEXT = `
+# Here's where the magic happens
+Feature: My awesome feature
+    Scenario: The easiest scenario I've ever written
+        When I type stuff
+        Then stuff happens right in front of my eyes!
+`.trim()
+
+
 export const InputEditor = () => {
 
     const cucumber = useContext(CucumberContext)
-    const [isStepRunning, setStepRunning] = useState(false)
     const alert = useAlert()
 
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
@@ -222,14 +230,10 @@ export const InputEditor = () => {
                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter
             ],
             run: (e) => {
-                if (!isStepRunning) {
-                    const selection = e.getSelection()
-                    const model = e.getModel()
-                    if (model && selection) {
-                        ServiceManager.execute(model, selection.startLineNumber)
-                    }
-                } else {
-                    alert.error('A step is still running')
+                const selection = e.getSelection()
+                const model = e.getModel()
+                if (model && selection) {
+                    ServiceManager.execute(model, selection.startLineNumber)
                 }
             }
         })
@@ -245,6 +249,7 @@ export const InputEditor = () => {
         <Editor height="100%"
             onMount={editorDidMount}
             defaultLanguage={INPUT_LANG_ID}
+            defaultValue={DEFAULT_TEXT}
         />
     )
 

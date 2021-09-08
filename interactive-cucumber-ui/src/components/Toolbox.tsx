@@ -127,14 +127,14 @@ export const Toolbox = () => {
             </TabList>
             <TabPanel>
                 <input onChange={(val) => setStepSearchValue(val.target.value.trim())}></input>
-                <div style={{ overflow: 'auto', maxHeight: `${height - 100}px` }}>
+                <div onScroll={ReactTooltip.rebuild} style={{ overflow: 'auto', maxHeight: `${height - 100}px` }}>
                     <ReactList length={stepDefs.length} itemRenderer={renderStepDef} />
                 </div>
                 <ReactTooltip id='stepdefs-tooltip' effect='solid' isCapture={true} clickable={true} multiline={true} getContent={renderStepDefTooltip} />
             </TabPanel>
             <TabPanel >
                 <input onChange={(val) => setFeatureSearchValue(val.target.value.trim())}></input>
-                <div style={{ overflow: 'auto', maxHeight: `${height - 50}px` }}>
+                <div onScroll={ReactTooltip.rebuild} style={{ overflow: 'auto', maxHeight: `${height - 50}px` }}>
                     <ReactList length={features.length} itemRenderer={renderFeature} />
                 </div>
                 <ReactTooltip id='feature-tooltip' effect='solid' isCapture={true} clickable={true} multiline={true} getContent={renderScenarioToolTip} />

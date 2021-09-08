@@ -36,7 +36,7 @@ export const Log = () => {
     }, update ? UPDATE_DELAY : null)
 
     const renderLog = (i: number, key: string | number) => (
-        <div className={`log-${list[i].level.toLowerCase()} code-text`}>
+        <div className={`log-${list[i].level.toLowerCase()} code-text`} key={`log-${i}`}>
             {list[i].timestamp.toLocaleTimeString()}{'> '}
             {withLineBreaks(list[i].message)}
         </div>
