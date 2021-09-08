@@ -94,7 +94,7 @@ export const Toolbox = () => {
                 </ol>
             </> : <></>}
 
-            <strong>Location: {'todo'}</strong>
+            <strong>Location: {stepDef.location}</strong>
 
         </div>)
     }

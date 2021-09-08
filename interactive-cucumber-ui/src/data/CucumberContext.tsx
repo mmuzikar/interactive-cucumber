@@ -22,13 +22,15 @@ export class StepDefinition {
     pattern: string
     arguments: Argument[]
     docs?: string
+    location: string
     private regexPattern?: RegExp
 
 
-    constructor(pattern: string, args: Argument[], docs?: string) {
+    constructor(pattern: string, args: Argument[], location: string, docs?: string) {
         this.pattern = pattern
         this.arguments = args
         this.docs = docs
+        this.location = location
 
         if (pattern.startsWith("^") && pattern.endsWith("$")) {
             try {
@@ -379,7 +381,7 @@ export class CucumberContextType {
 
     static async create(): Promise<CucumberContextType> {
         const data = await Promise.all([
-            fetchAPI('liststeps').then(resp => resp.json()).then(data => data.map((it: any) => new StepDefinition(it.pattern, it.args, it.docs))),
+            fetchAPI('liststeps').then(resp => resp.json()).then(data => data.map((it: any) => new StepDefinition(it.pattern, it.args, it.location, it.docs))),
             fetchAPI('typeregistry').then(resp => resp.json()).then(data => data as DataType[]),
             fetchAPI('feature').then(resp => resp.json()).then(data => data.map((it: any) => new Feature(it.source, it.uri)))
         ])

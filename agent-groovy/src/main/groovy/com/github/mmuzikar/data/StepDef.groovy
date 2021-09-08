@@ -1,59 +1,63 @@
 package com.github.mmuzikar.data
 
+import com.github.mmuzikar.utils.LineNumUtils
 import com.github.therapi.runtimejavadoc.RuntimeJavadoc
 
 import java.lang.reflect.Method
 import java.util.regex.Pattern
 
-class StepDef implements GroovyObject{
+class StepDef implements GroovyObject {
 
-    String pattern;
+	String pattern;
 
-    transient Method method;
-    transient def origObject;
+	transient Method method;
+	transient def origObject;
 
-    String location;
+	String location;
 
-    Argument[] args;
+	Argument[] args;
 
-    String docs
+	String docs
 
+	StepDef(origObject) {
+		this.origObject = origObject;
+		readPattern(origObject)
+		this.method = origObject.method;
+		loadArgs();
+		loadDocs()
+		resolveLocation()
+	}
 
-    StepDef(origObject) {
-        this.origObject = origObject;
-        readPattern(origObject)
-        this.method = origObject.method;
-        loadArgs();
-        loadDocs()
-    }
+	private void readPattern(origObject) {
+		def pattern = origObject.expression;
+		if (pattern instanceof Pattern) {
+			this.pattern = pattern.pattern();
+		} else {
+			this.pattern = pattern;
+		}
+	}
 
-    private void readPattern(origObject) {
-        def pattern = origObject.expression;
-        if (pattern instanceof Pattern) {
-            this.pattern = pattern.pattern();
-        } else {
-            this.pattern = pattern;
-        }
-    }
+	private void loadDocs() {
+		def javadoc = RuntimeJavadoc.getJavadoc(origObject.method)
+		if (!javadoc.isEmpty()) {
+			this.docs = javadoc.comment.toString()
+		}
+	}
 
-    private void loadDocs() {
-        def javadoc = RuntimeJavadoc.getJavadoc(origObject.method)
-        if (!javadoc.isEmpty()) {
-            this.docs = javadoc.comment.toString()
-        }
-    }
+	private void loadArgs() {
+		if (method) {
+			args = new Argument[method.parameterCount];
+			for (i in 0..<method.parameterCount) {
+				args[i] = new Argument(method.parameters[i]);
+			}
+		}
+	}
 
-    private void loadArgs() {
-        if (method) {
-            args = new Argument[method.parameterCount];
-            for (i in 0..<method.parameterCount) {
-                args[i] = new Argument(method.parameters[i]);
+	void execute(Object... params) {
+	}
 
-            }
-        }
-    }
-
-    void execute(Object... params) {
-
-    }
+	void resolveLocation() {
+		def lineNums = LineNumUtils.getLineNumberForMethods(method.getDeclaringClass())
+		location = method.declaringClass.getName() + "#" + method.getName() + ":" + lineNums[method.getName()]
+	}
 }
