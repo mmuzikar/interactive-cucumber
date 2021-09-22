@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>agent-groovy</module>
+		<module>interactive-cucumber-agent</module>
 		<module>interactive-cucumber-api</module>
 		<module>interactive-cucumber-ui</module>
 		<module>tests</module>

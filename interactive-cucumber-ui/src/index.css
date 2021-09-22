@@ -19,3 +19,7 @@ code {
 .draggable {
   cursor: move;
 }
+
+.searchBar {
+  width: 95%;
+}

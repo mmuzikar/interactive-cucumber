@@ -1,11 +1,12 @@
 package mmuzikar;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mmuzikar.interactive.cucumber.api.DataSuggestion;
+import com.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
+
 import io.cucumber.java.DefaultDataTableCellTransformer;
 import io.cucumber.java.DefaultDataTableEntryTransformer;
 import io.cucumber.java.DefaultParameterTransformer;
-import com.github.interactive.cucumber.DataSuggestion;
-import com.github.interactive.cucumber.ISuggestionProvider;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -15,7 +16,7 @@ public class ParameterTypes {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-        @DataSuggestion(SampleProvider.class)
+    @DataSuggestion(SampleProvider.class)
     @DefaultParameterTransformer
     @DefaultDataTableEntryTransformer
     @DefaultDataTableCellTransformer

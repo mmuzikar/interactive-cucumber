@@ -7,13 +7,14 @@ import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import com.github.interactive.cucumber.DataSuggestion;
-import com.github.interactive.cucumber.ISuggestionProvider;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.github.mmuzikar.interactive.cucumber.api.DataSuggestion;
+import com.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

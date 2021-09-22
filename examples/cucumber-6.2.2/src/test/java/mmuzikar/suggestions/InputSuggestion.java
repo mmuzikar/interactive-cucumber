@@ -1,10 +1,11 @@
 package mmuzikar.suggestions;
 
 import org.openqa.selenium.By;
-import com.github.interactive.cucumber.ISuggestionProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
 
 import static com.codeborne.selenide.Selenide.$$;
 

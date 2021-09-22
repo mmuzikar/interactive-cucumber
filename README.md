@@ -26,15 +26,15 @@ Then you can go to `tests/cucumber-6.2.2/` and run `mvn verify`, if everything g
 ```
 ...
 Registered 32 steps
-Registered path /liststeps @ com.github.mmuzikar.handlers.ListSteps
-Registered path /suggestion @ com.github.mmuzikar.handlers.SuggestionHandler
-Registered path /runstep @ com.github.mmuzikar.handlers.RunStepHandler
-Registered path /log @ com.github.mmuzikar.handlers.LogHandler
-Registered path /typeregistry @ com.github.mmuzikar.handlers.TypeRegistryHandler
-Registered path /feature @ com.github.mmuzikar.handlers.FeatureHandler
-Registered path /doc @ com.github.mmuzikar.handlers.DocHandler
-Registered path / @ com.github.mmuzikar.handlers.UiHandler
-Registered path /save @ com.github.mmuzikar.handlers.SaveHandler
+Registered path /liststeps @ com.github.mmuzikar.interactive.cucumber.agent.handlers.ListSteps
+Registered path /suggestion @ com.github.mmuzikar.interactive.cucumber.agent.handlers.SuggestionHandler
+Registered path /runstep @ com.github.mmuzikar.interactive.cucumber.agent.handlers.RunStepHandler
+Registered path /log @ com.github.mmuzikar.interactive.cucumber.agent.handlers.LogHandler
+Registered path /typeregistry @ com.github.mmuzikar.interactive.cucumber.agent.handlers.TypeRegistryHandler
+Registered path /feature @ com.github.mmuzikar.interactive.cucumber.agent.handlers.FeatureHandler
+Registered path /doc @ com.github.mmuzikar.interactive.cucumber.agent.handlers.DocHandler
+Registered path / @ com.github.mmuzikar.interactive.cucumber.agent.handlers.UiHandler
+Registered path /save @ com.github.mmuzikar.interactive.cucumber.agent.handlers.SaveHandler
 Server is open http://localhost:28319
 ```
 Open [http://localhost:28319](http://localhost:28319). 

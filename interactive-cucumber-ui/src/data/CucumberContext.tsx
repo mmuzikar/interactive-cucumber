@@ -22,15 +22,30 @@ export class StepDefinition {
     pattern: string
     arguments: Argument[]
     docs?: string
-    location: string
+    location?: {
+        className: string,
+        methodName: string,
+        lineNum: number
+    }
+    tags: string[]
     private regexPattern?: RegExp
 
+    private static LOCATON_REGEX = /(.*)#(.*):(\d+)/;
 
-    constructor(pattern: string, args: Argument[], location: string, docs?: string) {
+
+    constructor(pattern: string, args: Argument[], location: string, docs: string | undefined, tags: string[]) {
         this.pattern = pattern
         this.arguments = args
         this.docs = docs
-        this.location = location
+        this.tags = tags
+        const result = StepDefinition.LOCATON_REGEX.exec(location)
+        if (result) {
+            this.location = {
+                className: result[1],
+                methodName: result[2],
+                lineNum: Number(result[3])
+            }
+        }
 
         if (pattern.startsWith("^") && pattern.endsWith("$")) {
             try {
@@ -381,7 +396,7 @@ export class CucumberContextType {
 
     static async create(): Promise<CucumberContextType> {
         const data = await Promise.all([
-            fetchAPI('liststeps').then(resp => resp.json()).then(data => data.map((it: any) => new StepDefinition(it.pattern, it.args, it.location, it.docs))),
+            fetchAPI('liststeps').then(resp => resp.json()).then(data => data.map((it: any) => new StepDefinition(it.pattern, it.args, it.location, it.docs, it.tags))),
             fetchAPI('typeregistry').then(resp => resp.json()).then(data => data as DataType[]),
             fetchAPI('feature').then(resp => resp.json()).then(data => data.map((it: any) => new Feature(it.source, it.uri)))
         ])

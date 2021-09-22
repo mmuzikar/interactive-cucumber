@@ -1,6 +1,8 @@
 package mmuzikar;
 
 import com.codeborne.selenide.Selenide;
+import com.github.mmuzikar.interactive.cucumber.api.Suggestion;
+
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -8,9 +10,9 @@ import mmuzikar.suggestions.DeparturePlaceProvider;
 import mmuzikar.suggestions.DstPlaceProvider;
 import mmuzikar.suggestions.InputSuggestion;
 import mmuzikar.suggestions.LinkTextSuggestion;
+
 import org.junit.Assert;
 import org.openqa.selenium.By;
-import com.github.interactive.cucumber.Suggestion;
 
 import java.util.Map;
 
