@@ -1,17 +1,24 @@
 import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react"
-import { CucumberContext, Feature, StepDefinition } from "../data/CucumberContext"
+import { CucumberContext } from "../data/CucumberContext"
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css"
 import ReactList from "react-list";
 import { useMeasure } from "react-use";
 import ReactTooltip, { GetContent } from "react-tooltip";
 import Fuse from "fuse.js";
+import { StepDefinition } from "../data/cucumber/StepDefinition";
+import { Feature } from "../data/cucumber/Feature";
 
 const adjustToParent: React.CSSProperties = { height: "100%", display: 'block', marginBottom: '0px' }
 
+type SearchBarProps = {
+    setStepSearchValue : (val:string) => void
+}
+
+const SearchBar = ({setStepSearchValue} : SearchBarProps) => <input className='searchBar' onChange={(val) => setStepSearchValue(val.target.value.trim())} placeholder='Search...' />
+
 export const Toolbox = () => {
 
-    const cucumber = useContext(CucumberContext)
     const [Measure, { height }] = useMeasure()
 
 
@@ -23,7 +30,7 @@ export const Toolbox = () => {
     return (<div className='grid-item' ref={(el) => Measure(el as Element)}>
         <Tabs style={adjustToParent} onSelect={index => { setTimeout(() => ReactTooltip.rebuild(), 100) }}>
             <TabList>
-                <Tab>Step list</Tab>
+                <Tab>Step definitions</Tab>
                 <Tab>Scenarios</Tab>
             </TabList>
             <TabPanel>
@@ -82,7 +89,7 @@ const StepDefPanel = ({ height }: PanelProps) => {
 
             return acc
         }, { "untagged": [] } as Record<string, StepDefinition[]>)
-    }, [stepDefs, groupingMode, stepSearchValue]);
+    }, [stepDefs, groupingMode]);
 
     const stepDefGroups = useMemo(() => Object.keys(groupedStepDefs), [groupedStepDefs])
 
@@ -96,11 +103,11 @@ const StepDefPanel = ({ height }: PanelProps) => {
             //UseEffect sometimes gets called before the DOM is updated and ReactTooltip doesn't recognize all tooltip elements
             ReactTooltip.rebuild()
         }, 100);
-    }, [stepSearchValue, cucumber])
+    }, [stepSearchValue, cucumber, groupingMode])
 
     const renderStepDef = (i: number, key: string | number) => {
         return (
-            <div key={`stepdef-${i}`} data-for='stepdefs-tooltip' data-tip={i}>{stepDefs[i].getPatternWithoutControlChars()}</div>
+            <li key={`stepdef-ungrouped-${i}`} data-for='stepdefs-tooltip' data-tip={i}>{stepDefs[i].getPatternWithoutControlChars()}</li>
         )
     }
 
@@ -132,8 +139,8 @@ const StepDefPanel = ({ height }: PanelProps) => {
         return stepDefToolTip(stepDef)
     }
 
-    const renderGrupedStepDefToolTip: GetContent = (datatip) => {
-        if (!datatip) {
+    const renderGroupedStepDefToolTip: GetContent = (datatip) => {
+        if (!datatip || !groupedStepDefs) {
             return <></>
         }
         const [i, j] = datatip.split('-').map(Number)
@@ -149,7 +156,7 @@ const StepDefPanel = ({ height }: PanelProps) => {
             <strong>{stepDefGroups[i]}</strong>
             <ul>
                 {
-                    groupedStepDefs[stepDefGroups[i]].map((val, j) => (<div key={`stepdef-${i}`} data-for='stepdefs-tooltip' data-tip={`${i}-${j}`}>{val.getPatternWithoutControlChars()}</div>))
+                    groupedStepDefs[stepDefGroups[i]].map((val, j) => (<li key={`stepdef-${groupingMode}-${i}-${j}`} data-for='stepdefs-tooltip' data-tip={`${i}-${j}`}>{val.getPatternWithoutControlChars()}</li>))
                 }
             </ul>
         </div>
@@ -160,7 +167,8 @@ const StepDefPanel = ({ height }: PanelProps) => {
 
     return <>
         <div>
-            <input className='searchBar' onChange={(val) => setStepSearchValue(val.target.value.trim())} placeholder='Search...'></input><hr />
+            <SearchBar setStepSearchValue={setStepSearchValue}/>
+            <hr />
         </div>
         <div>
             <strong>Grouping mode</strong><br />
@@ -168,16 +176,15 @@ const StepDefPanel = ({ height }: PanelProps) => {
             <input onChange={groupingEventHandler} type='radio' value='Tags' name='Tags' checked={groupingMode === 'Tags'} /><label htmlFor='Tags'>Tags</label>
             <input onChange={groupingEventHandler} type='radio' value='Classes' name='Classes' checked={groupingMode === 'Classes'} /><label htmlFor='Classes'>Classes</label>
         </div>
-        <div onScroll={ReactTooltip.rebuild} style={{ overflow: 'auto', maxHeight: `${height - 100}px` }}>
+        <div onScroll={ReactTooltip.rebuild} style={{ overflow: 'auto', maxHeight: `${height - 125}px` }}>
             {
                 groupingMode === 'None' ?
-                    <ReactList length={stepDefs.length} itemRenderer={renderStepDef} /> :
+                    <ul><ReactList length={stepDefs.length} itemRenderer={renderStepDef} /></ul> :
                     <ReactList length={stepDefGroups.length} itemRenderer={renderStepDefGroup}/>
 
             }
         </div>
-        <ReactTooltip id='stepdefs-tooltip' effect='solid' isCapture={true} clickable={true} multiline={true} getContent={groupingMode === 'None' ? renderStepDefTooltip : renderGrupedStepDefToolTip} />
-
+        <ReactTooltip id='stepdefs-tooltip' effect='solid' isCapture={true} clickable={true} multiline={true} getContent={groupingMode === 'None' ? renderStepDefTooltip : renderGroupedStepDefToolTip} />
     </>
 }
 
@@ -196,7 +203,6 @@ const FeaturesPanel = ({ height }: PanelProps) => {
 
     useEffect(() => {
         if (featureSearchValue.length > 0) {
-            console.log(featureSearch.search(featureSearchValue))
             setFeatures(featureSearch.search(featureSearchValue).map(val => val.item))
         } else {
             setFeatures(cucumber.features)
@@ -241,7 +247,7 @@ const FeaturesPanel = ({ height }: PanelProps) => {
     }
 
     return (<>
-        <input onChange={(val) => setFeatureSearchValue(val.target.value.trim())} placeholder='Search...'></input>
+        <SearchBar setStepSearchValue={setFeatureSearchValue}/>
         <div onScroll={ReactTooltip.rebuild} style={{ overflow: 'auto', maxHeight: `${height - 50}px` }}>
             <ReactList length={features.length} itemRenderer={renderFeature} />
         </div>

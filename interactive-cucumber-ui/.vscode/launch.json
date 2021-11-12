@@ -18,5 +18,16 @@
             "url": "http://localhost:3000",
             "webRoot": "${workspaceFolder}"
         },
+        {
+            "name": "Chrome",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/src",
+            "sourceMapPathOverrides": {
+                "webpack:///src/*": "${webRoot}/*"
+        
+            }
+        }
     ]
 }

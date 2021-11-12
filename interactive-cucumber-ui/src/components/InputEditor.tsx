@@ -83,28 +83,25 @@ export const InputEditor = () => {
             ])
         }, undefined)!
 
+        const runBackgroundCommandId = editor.addCommand(0, (ctx, model: editor.ITextModel, lineNum: number) => {
+            while (model.getLineContent(lineNum) && !(/Scenario: .*/.test(model.getLineContent(lineNum)))) {
+                if (ServiceManager.canHandle(model, lineNum)) {
+                    ServiceManager.execute(model, lineNum, 'background')
+                } else if (model.getLineContent(lineNum).trim().length === 0) {
+                    model.applyEdits([
+                        {
+                            range: new Range(lineNum, 0, lineNum + 1, -1),
+                            text: ''
+                        }
+                    ])
+                } else {
+                    alert.error(`${model.getLineContent(lineNum)} can't be executed`)
+                    return
+                }
+            }
+        }, undefined)!
+
         const runScenario = editor.addCommand(0, (ctx, model: editor.ITextModel, lineNum: number) => {
-            // is there line above the scenario
-            // if (lineNum - 1 >= 1) {
-            //     while(model.getLineContent(lineNum - 1).match(/@.*/)) {
-            //         model.applyEdits([
-            //             {
-            //                 range: new Range(lineNum -1, 0, lineNum, -1),
-            //                 text: ''
-            //             }
-            //         ])
-            //         lineNum--
-            //         if (lineNum === 1){
-            //             break
-            //         }
-            //     }
-            // }
-            // model.applyEdits([
-            //     {
-            //         range: new Range(lineNum, 0, lineNum + 1, -1),
-            //         text: ''
-            //     }
-            // ])
             //Handle body
             while (model.getLineContent(lineNum)) {
                 if (model.getLineContent(lineNum).trim().length === 0) {
@@ -117,7 +114,7 @@ export const InputEditor = () => {
                     continue
                 }
                 if (ServiceManager.canHandle(model, lineNum)) {
-                    ServiceManager.execute(model, lineNum)
+                    ServiceManager.execute(model, lineNum, 'scenario')
                 } else {
                     break
                 }
@@ -128,6 +125,16 @@ export const InputEditor = () => {
             provideCodeLenses: (model: editor.ITextModel, token: CancellationToken) => {
                 let lenses: languages.CodeLens[] = []
                 const backgroundMatches = model.findMatches('Background:.*', true, true, false, ' ', false)
+                lenses.push(...backgroundMatches.map(match => ({
+                    range: match.range,
+                    command: {
+                        id: runBackgroundCommandId,
+                        title: 'Execute background',
+                        tooltip: 'Executes the background section',
+                        arguments: [model, match.range.startLineNumber]
+                    },
+                    id: 'execute-background'
+                })))
                 lenses.push(...backgroundMatches.map(match => ({
                     range: match.range,
                     command: {
@@ -180,9 +187,6 @@ export const InputEditor = () => {
                     })) as languages.CompletionItem[]
 
                     const closestSteps = cucumber.findSteps(stepRegex[1])
-                    console.group('closest steps')
-                    console.debug(closestSteps)
-                    console.groupEnd()
                     if (closestSteps.length > 0 && closestSteps[0].score && closestSteps[0].score > 0.1) {
                         const suggestionPromise = closestSteps[0].item.provideSuggestions(stepRegex[1])
                         const suggestionsForArgs = await suggestionPromise
@@ -237,6 +241,38 @@ export const InputEditor = () => {
                 }
             }
         })
+
+        editor.addAction({
+            contextMenuGroupId: INPUT_LANG_ID,
+            id: 'run-all',
+            label: 'Run All',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
+            run: (e) => {
+                const model = e.getModel()
+                if (model) {
+                    let lineNum = 1;
+                    let context = ''
+                    while (model.getLineCount() >= lineNum && model.getValue()) {
+                        const line = model.getLineContent(lineNum);
+                        if (line.match(/Background:.*/)) {
+                            context = 'background'
+                        } else if (line.match(/Scenario:.*/)) {
+                            context = 'scenario'
+                        }
+                        if (ServiceManager.canHandle(model, lineNum)) {
+                            ServiceManager.execute(model, lineNum, context)
+                        } else {
+                            if (line.trim().length !== 0) {
+                                alert.error(`Can't handle line ${line}`)
+                            }
+                            lineNum++
+                        }
+                    }
+                }
+            }
+        })
+
+        editor.addOverlayWidget(new RunScenarioWidget(editor))
     }
 
     const setContent = (text: string) => {
@@ -250,7 +286,45 @@ export const InputEditor = () => {
             onMount={editorDidMount}
             defaultLanguage={INPUT_LANG_ID}
             defaultValue={DEFAULT_TEXT}
+            options={{
+                minimap: {
+                    enabled: false
+                }
+            }}
         />
     )
+
+}
+
+class RunScenarioWidget implements editor.IOverlayWidget {
+
+    constructor(private editor: editor.IStandaloneCodeEditor) { }
+
+    domNode?: HTMLButtonElement
+
+    getId(): string {
+        return 'run-scenario-button'
+    }
+    getDomNode(): HTMLElement {
+        if (!this.domNode) {
+            this.domNode = document.createElement("button")
+            this.domNode.classList.add('overlay-button')
+            this.domNode.innerHTML = "Run Scenario"
+
+            this.domNode.style.right = '30px';
+            const height = 32;
+            const offset = 5;
+            this.domNode.style.fontSize = "larger";
+            this.domNode.style.height = `${height}px`;
+            this.domNode.style.top = this.editor.getDomNode()!.clientHeight - height - offset + "px";
+
+            this.domNode.onclick = () => this.editor.getAction('run-all').run()
+        }
+
+        return this.domNode;
+    }
+    getPosition(): editor.IOverlayWidgetPosition | null {
+        return null
+    }
 
 }

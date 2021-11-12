@@ -2,7 +2,7 @@
 let isHosted: boolean = process.env.NODE_ENV === 'production'
 
 
-const getUrl = (endpoint:string) => {
+const getUrl = (endpoint: string) => {
     return isHosted ? `/${endpoint}` : `http://localhost:28319/${endpoint}`
 }
 
@@ -16,4 +16,13 @@ export const postApi = (endpoint: string, body: any) => {
         body: body,
         method: "POST"
     })
+}
+
+export function saveScenario(text: string, uri: string, scenarioName:string, override=false) {
+    postApi('save', JSON.stringify({
+        uri,
+        scenarioName,
+        content: text,
+        override
+    }))
 }

@@ -7,7 +7,7 @@ import { TagService } from "./TagService";
 
 export interface Service {
     canHandle(model : editor.ITextModel, lineNum : number) : boolean
-    execute(model : editor.ITextModel, lineNum : number) : void
+    execute(model : editor.ITextModel, lineNum : number, command? : string) : void
 }
 
 class ServiceManagerImpl implements Service {
@@ -30,16 +30,14 @@ class ServiceManagerImpl implements Service {
 
     canHandle(model: editor.ITextModel, lineNum: number): boolean {
         const svc =  this.findService(model, lineNum)
-        console.debug('can handle: ', svc)
         return svc !== undefined
     }
     
 
-    execute(model: editor.ITextModel, lineNum: number): void {
+    execute(model: editor.ITextModel, lineNum: number, command?: string): void {
         const svc = this.findService(model, lineNum)
-        console.debug('Found service', svc)
         if (svc) {
-            svc.execute(model, lineNum)
+            svc.execute(model, lineNum, command)
         } else {
             this.alert.error(`Can't find a service to handle line '${model.getLineContent(lineNum)}'`)
         }

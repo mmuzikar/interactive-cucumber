@@ -1,24 +1,37 @@
-# Interactive testing code contents
+# Interactive testing 
 
-See your tests' results as you're writing them. A REPL for your Cucumber BDD tests.
+See your tests' results as you're writing them. A REPL for your JUnit Cucumber BDD tests.
 
-Making your testsuite interactive is as easy as adding a `-javaagent:...` to your test execution configuration.
+No additional code required, just add a dependency and configure your test runner and you're ready to go.
 
+## Requirements
+Currently tested configration is Cucumber 6.2.2 + JUnit 4.13. More configurations coming in the future.
 
-# Requirements
-For running the test suite JDK version 8 and maven are required. Other than that maven should fetch all of its dependencies. As for the UI part npm needs to be installed and `npm install` should suffice. 
+## Setup
+Add following dependency to your project: 
+```
+<dependency>
+    <groupId>com.github.mmuzikar</groupId>
+    <artifactId>interactive-cucumber-agent</artifactId>
+    <version>[version]</version>
+</dependency>
+```
+And configure your runner to run on a specific profile, eg.
+```
+<plugin>
+    <artifactId>maven-(surefire|failsafe)-plugin</artifactId>
+    <version>2.22.2</version>
+    <configuration>
+        <argLine>-javaagent:${settings.localRepository}/com/github/mmuzikar/interactive-cucumber-agent/[version]/interactive-cucumber-agent-[version].jar</argLine>
+    </configuration>
+</plugin>
+```
 
 ## Contents
-* agent-groovy - the code responsible for customizing testsuites 
-* tests - integration tests
-* interactive-cucumber-ui - console for writing your tests
-
-# What's more to come?
-This project is still in early stages, following features are planned and hopefully soon to come:
-* maven-plugin? - There's no convenient way to automatically get the agent JAR and configure it.
-* scripting - for debugging your debugging needs you'll be able to interface with the testing code and try why is this pesky method failing all the time.
-* adding / changing step definitions - change your mistakes while you can see what's failing and use the correct stepdef later
-
+* interactive-cucumber-agent - the code responsible for customizing testsuites 
+* tests - integration tests, currently only for the generated REST endpoint
+* interactive-cucumber-ui - UI for writing your tests
+* examples - example and an example testsuite to be tested by tests
 
 ## Starting the application
 First you'll need to `mvn install` the repository. Use `mvn install -Pstandalone` if you want to build the UI and bundle it to the agent.

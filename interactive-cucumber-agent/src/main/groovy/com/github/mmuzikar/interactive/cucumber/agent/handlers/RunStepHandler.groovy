@@ -16,7 +16,8 @@ class RunStepHandler implements Handler {
         executor.execute {
             def result = CucumberInterceptor.cucumber.runStep(body)
             if (result.isPresent()){
-                sendResponse(exchange, result.get(), 500)
+                sendResponse(exchange, result.get().getMessage(), 500)
+                result.get().printStackTrace()
             } else {
                 sendResponse(exchange, "")
             }

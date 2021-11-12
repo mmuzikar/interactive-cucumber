@@ -38,21 +38,21 @@ class Cucumber implements GroovyObject {
         return new InMemoryStep(text)
     }
 
-    Optional<String> runStep(String step) {
+    Optional<Throwable> runStep(String step) {
         def stepObj = createStep(step)
         def match
         try {
             match = glue.origObject.stepDefinitionMatch(URI.create("inmemory"), stepObj)
         } catch (Throwable e) {
-            return Optional.of(e.message)
+            return Optional.of(e)
         }
         if (match == null) {
-            return Optional.of("No match found for step $step".toString())
+            return Optional.of(new IllegalStateException("No match found for step $step".toString()))
         }
         try {
             match.runStep(testCase)
         } catch (Throwable t) {
-            return Optional.of(t.message)
+            return Optional.of(t)
         }
         return Optional.empty()
     }

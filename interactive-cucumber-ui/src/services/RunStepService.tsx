@@ -16,8 +16,8 @@ export class RunStepService implements Service {
     canHandle(model: editor.ITextModel, lineNum: number): boolean {
         return STEP_PATTERN.test(model.getLineContent(lineNum))
     }
-    
-    execute(model: editor.ITextModel, lineNum: number): void {
+
+    execute(model: editor.ITextModel, lineNum: number, command?: string): void {
         const line = model.getLineContent(lineNum)
         const keyword = line.trim().split(/\s/)[0]
         const stepText = STEP_PATTERN.exec(line)
@@ -51,14 +51,25 @@ export class RunStepService implements Service {
                 break
             }
             const wholeStep = keyword + ' ' + stepValue
-            const resolve = this.cucumber.currentScenario.addStep({ text: wholeStep, status: 'scheduled' })
-            this.cucumber.enqueueStep(stepValue, resolve)
-            model.applyEdits([
-                {
-                    range: new Range(lineNum, 0, i, -1),
-                    text: ""
-                }
-            ])
+            if (command && command === 'background') {
+                const resolve = this.cucumber.currentScenario.addBackgroundStep({ text: wholeStep, status: 'scheduled' })
+                this.cucumber.enqueueStep(stepValue, resolve)
+                model.applyEdits([
+                    {
+                        range: new Range(lineNum, 0, i, -1),
+                        text: ""
+                    }
+                ])
+            } else {
+                const resolve = this.cucumber.currentScenario.addStep({ text: wholeStep, status: 'scheduled' })
+                this.cucumber.enqueueStep(stepValue, resolve)
+                model.applyEdits([
+                    {
+                        range: new Range(lineNum, 0, i, -1),
+                        text: ""
+                    }
+                ])
+            }
         } else {
             this.alert.error(`'${model.getLineContent(lineNum)}' is not a valid step`)
         }

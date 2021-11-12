@@ -9,7 +9,7 @@ class FeatureHandler implements Handler {
     void handle(HttpExchange exchange) throws IOException {
         sendResponse(exchange, new Gson().toJson(CucumberInterceptor.cucumber.features.collect {
             [
-                    uri   : it.uri,
+                    uri   : it.uri.toString().replace('classpath:', ''),
                     source: it.source
             ]
         }))

@@ -30,7 +30,7 @@ export const App = () => {
 
   if (context.error) {
     content = <div>
-      <h1>Something wrong happened</h1>
+      <h1>Something went wrong</h1>
       <strong>{context.error.name}</strong>
       <p>{context.error.message}</p>
       <p>Please check your testsuite, is it running? Have you tried turning it off and on?</p>
@@ -38,20 +38,21 @@ export const App = () => {
     </div>;
   } else if (context.value) {
     content = <CucumberContext.Provider value={context.value}>
-      <GridLayout draggableHandle='.draggable' layout={layout} className="layout" cols={12} width={width} rowHeight={(height - 50) / 3}>
-        <div key='input'><InputEditor /></div>
-        <div key='output'><Output /></div>
-        <div key='log'><Log /></div>
-        <div key='toolbox'><Toolbox /></div>
-      </GridLayout>
+      <AlertProvider containerStyle={{zIndex: 100, width: 'auto'}} template={AlertTemplate} timeout={5000} position='top center' transition='fade'>
+
+        <GridLayout draggableHandle='.draggable' layout={layout} className="layout" cols={12} width={width} rowHeight={(height - 50) / 3}>
+          <div key='input'><InputEditor /></div>
+          <div key='output'><Output /></div>
+          <div key='log'><Log /></div>
+          <div key='toolbox'><Toolbox /></div>
+        </GridLayout>
+      </AlertProvider>
     </CucumberContext.Provider>
 
   }
 
   return <div className="App">
-    <AlertProvider template={AlertTemplate} timeout={5000} position='top center' transition='fade'>
-      {content}
-    </AlertProvider>
+    {content}
   </div>
     ;
 };

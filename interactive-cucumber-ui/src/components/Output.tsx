@@ -1,15 +1,15 @@
 import { useContext } from "react"
-import { useAlert } from "react-alert"
-import { useMount, useUpdate } from "react-use"
-import { postApi } from "../config/Utils"
+import { useBoolean, useMount, useUpdate } from "react-use"
 import { CucumberContext } from "../data/CucumberContext"
 import { withLineBreaks } from "../utils/textutils"
-
+import { StepStatus } from "../data/cucumber/EditableScenario"
+import Modal from 'react-overlays/Modal'
+import { SavePrompt } from "./SavePrompt"
 
 export const Output = () => {
     const cucumber = useContext(CucumberContext)
+    const [isSaving, setSaving] = useBoolean(false)
 
-    const alert = useAlert()
     const update = useUpdate()
     useMount(() => cucumber.currentScenario.observers.push(update))
 
@@ -20,8 +20,12 @@ export const Output = () => {
         }
     }
 
-    const removeFailedStep = (i: number) => {
-        cucumber.currentScenario.removeStep(i)
+    const removeFailedStep = (i: number, prefix: string) => {
+        if (prefix === 'background') {
+            cucumber.currentScenario.removeBackgroundStep(i)
+        } else {
+            cucumber.currentScenario.removeStep(i)
+        }
     }
 
     const clear = () => {
@@ -29,50 +33,16 @@ export const Output = () => {
     }
 
     const save = () => {
-        let uri = cucumber.currentScenario.featureId?.replace('classpath:', '')
-        if (!uri) {
-            if (cucumber.currentScenario.featureName) {
-                const foundFeat = cucumber.features.find(feat => feat.name === cucumber.currentScenario.featureName)
-                if (foundFeat) {
-                    uri = foundFeat.uri
-                } else {
-                    const uriProposal = cucumber.currentScenario.featureName.replaceAll(/\s/g, '_').toLowerCase() + '.feature'
-                    const shouldSave = window.confirm(`Would you like to create a new feature file at path 'resources/${uriProposal}'?`)
-                    if (shouldSave) {
-                        uri = uriProposal
-                    } else {
-                        return;
-                    }
-                }
-            } else {
-                const uriInput = prompt('Please set your filename', 'features/myFeature.feature')
-                if (uriInput) {
-                    uri = uriInput
-                } else {
-                    alert.error('Please set your filename or set feature and scenario names to autogenerate')
-                    return
-                }
-            }
-        }
-
-        if (!cucumber.currentScenario.name) {
-            const scenarioName = prompt("Please set your scenario name")
-            if (scenarioName) {
-                cucumber.currentScenario.name = scenarioName
-            } else {
-                return
-            }
-        }
-
-        postApi('save', JSON.stringify({
-            uri: uri,
-            scenarioName: cucumber.currentScenario.name,
-            content: cucumber.currentScenario.getText()
-        }))
-        clear()
-        alert.info(`Saved at uri: ${uri}`)
-
+        setSaving(true)
     }
+
+    function renderBackdrop() {
+        return <div className='backdrop' onClick={() => setSaving(false)} />
+    }
+
+    const renderStepList = (steps: StepStatus[], prefix: string) => <ul className='output-list'>
+        {steps.map((step, i) => <li key={`${prefix}-step-${i}`} className={`step-${step.status}`} onClick={() => removeFailedStep(i, prefix)}>{withLineBreaks(step.text)}</li>)}
+    </ul>
 
     return (
         <div className='grid-item'>
@@ -86,12 +56,15 @@ export const Output = () => {
             <div className='code-text'>
                 {cucumber.currentScenario.tags ? <ul>{cucumber.currentScenario.tags.map(tag => <li>{tag}</li>)}</ul> : <></>}
                 {cucumber.currentScenario.featureName ? <><strong>Feature: {cucumber.currentScenario.featureName}</strong><br /></> : <></>}
+                {cucumber.currentScenario.hasBackground() ? <div>
+                    <strong>Background: {cucumber.currentScenario.background.name}</strong>
+                    {renderStepList(cucumber.currentScenario.background.steps, 'background')}
+                </div> : <></>}
+
                 <strong>Scenario: {cucumber.currentScenario.name ? cucumber.currentScenario.name : <span className='log-error'>No scenario name set</span>}</strong>
-                <ul className='output-list'>
-                    {cucumber.currentScenario.steps.map((step, i) =>
-                        <li key={`output-step-${i}`} className={`step-${step.status}`} onClick={() => removeFailedStep(i)}>{withLineBreaks(step.text)}</li>)}
-                </ul>
+                {renderStepList(cucumber.currentScenario.steps, 'scenario')}
             </div>
+            {isSaving ? <Modal className='modal' renderBackdrop={renderBackdrop} show={isSaving}><SavePrompt close={() => setSaving(false)} /></Modal> : <></>}
         </div>
     )
 }
