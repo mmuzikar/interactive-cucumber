@@ -9,14 +9,13 @@
 
 	<parent>
 		<artifactId>interactive-cucumber</artifactId>
-		<groupId>com.github.mmuzikar</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<groupId>io.github.mmuzikar</groupId>
+		<version>1.0.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>interactive-cucumber-agent</artifactId>
 	<name>Interactive cucumber agent</name>
-	<version>1.0-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
@@ -58,7 +57,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.mmuzikar</groupId>
+			<groupId>io.github.mmuzikar</groupId>
 			<artifactId>interactive-cucumber-api</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
@@ -122,7 +121,7 @@
 				<configuration>
 					<excludePackageNames/>
 					<dependencySourceExcludes>
-						<exclude>com.github.mmuzikar:interactive-cucumber-ui</exclude>
+						<exclude>io.github.mmuzikar:interactive-cucumber-ui</exclude>
 					</dependencySourceExcludes>
 				</configuration>
 			</plugin>
@@ -134,7 +133,7 @@
 					<archive>
 						<manifestEntries>
 							<addClasspath>true</addClasspath>
-							<Premain-Class>com.github.mmuzikar.interactive.cucumber.agent.Main</Premain-Class>
+							<Premain-Class>io.github.mmuzikar.interactive.cucumber.agent.Main</Premain-Class>
 							<Can-Retransform-Classes>true</Can-Retransform-Classes>
 							<Can-Redefine-Classes>true</Can-Redefine-Classes>
 						</manifestEntries>
@@ -152,7 +151,7 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.github.mmuzikar</groupId>
+					<groupId>io.github.mmuzikar</groupId>
 					<artifactId>interactive-cucumber-ui</artifactId>
 					<version>${project.version}</version>
 				</dependency>

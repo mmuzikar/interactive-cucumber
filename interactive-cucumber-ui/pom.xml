@@ -5,13 +5,13 @@
 
 	<parent>
 		<artifactId>interactive-cucumber</artifactId>
-		<groupId>com.github.mmuzikar</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<groupId>io.github.mmuzikar</groupId>
+		<version>1.0.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>interactive-cucumber-ui</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<properties>

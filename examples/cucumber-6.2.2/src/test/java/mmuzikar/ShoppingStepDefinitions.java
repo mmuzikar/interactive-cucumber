@@ -13,8 +13,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.github.mmuzikar.interactive.cucumber.api.DataSuggestion;
-import com.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
+import io.github.mmuzikar.interactive.cucumber.api.DataSuggestion;
+import io.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

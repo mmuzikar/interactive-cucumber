@@ -7,7 +7,7 @@ import io.cucumber.java.en.When;
 
 import java.util.Date;
 
-import com.github.mmuzikar.interactive.cucumber.api.Tag;
+import io.github.mmuzikar.interactive.cucumber.api.Tag;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

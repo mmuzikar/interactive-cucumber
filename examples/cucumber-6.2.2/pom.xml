@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cucumber-6.2.2</artifactId>
-    <version>${project.version}</version>
+    <version>1.0.0</version>
 
     <parent>
-        <artifactId>tests</artifactId>
-        <groupId>mmuzikar</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <artifactId>interactive-cucumber-examples</artifactId>
+        <groupId>io.github.mmuzikar</groupId>
+        <version>1.0.0</version>
     </parent>
 
 
@@ -68,9 +68,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.mmuzikar</groupId>
+            <groupId>io.github.mmuzikar</groupId>
             <artifactId>interactive-cucumber-agent</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
@@ -115,7 +115,7 @@
                 <version>2.22.2</version>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
-                    <argLine>-javaagent:${settings.localRepository}/com/github/mmuzikar/interactive-cucumber-agent/1.0-SNAPSHOT/interactive-cucumber-agent-1.0-SNAPSHOT.jar</argLine>
+                    <argLine>-javaagent:${settings.localRepository}/io/github/mmuzikar/interactive-cucumber-agent/${project.version}/interactive-cucumber-agent-${project.version}.jar</argLine>
                 </configuration>
             </plugin>
         </plugins>

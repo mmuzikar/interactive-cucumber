@@ -5,7 +5,7 @@ import org.openqa.selenium.By;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
+import io.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
 
 import static com.codeborne.selenide.Selenide.$$;
 

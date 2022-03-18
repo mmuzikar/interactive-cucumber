@@ -1,7 +1,7 @@
 package mmuzikar;
 
 import com.codeborne.selenide.Selenide;
-import com.github.mmuzikar.interactive.cucumber.api.Suggestion;
+import io.github.mmuzikar.interactive.cucumber.api.Suggestion;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
