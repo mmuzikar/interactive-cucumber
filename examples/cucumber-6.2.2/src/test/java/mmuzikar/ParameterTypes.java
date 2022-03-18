@@ -1,8 +1,8 @@
 package mmuzikar;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mmuzikar.interactive.cucumber.api.DataSuggestion;
-import com.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
+import io.github.mmuzikar.interactive.cucumber.api.DataSuggestion;
+import io.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
 
 import io.cucumber.java.DefaultDataTableCellTransformer;
 import io.cucumber.java.DefaultDataTableEntryTransformer;

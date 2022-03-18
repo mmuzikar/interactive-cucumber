@@ -1,7 +1,7 @@
 package mmuzikar.suggestions;
 
 import com.codeborne.selenide.SelenideElement;
-import com.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
+import io.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider;
 
 import org.openqa.selenium.By;
 
