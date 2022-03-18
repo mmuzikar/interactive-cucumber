@@ -37,7 +37,7 @@ export class Feature {
 
             this.parsedFeature.children.forEach(child => {
                 if (child.scenario) {
-                    this.scenarios?.push(new Scenario(child.scenario, this.background))
+                    this.scenarios?.push(new Scenario(child.scenario, this, this.background))
 
                 } else if (child.rule) {
                     //TODO

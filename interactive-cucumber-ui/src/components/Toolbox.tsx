@@ -220,7 +220,6 @@ const FeaturesPanel = ({ height }: PanelProps) => {
                 {features[i].scenarios?.map((sc, j) => <li key={`scenario-${i}-${j}`} data-for='feature-tooltip' data-tip={i + '-' + j} className='clickable' onClick={() => {
                     if (cucumber.setEditorContent) {
                         cucumber.setEditorContent(sc.getScenarioText())
-                        cucumber.currentScenario.featureId = features[i].uri
                     }
                 }}>{sc.name}</li>)}
             </ul>

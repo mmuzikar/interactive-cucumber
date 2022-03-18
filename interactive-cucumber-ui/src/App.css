@@ -81,7 +81,7 @@
 }
 
 .overlay-button {
-  opacity: 20%;
+  opacity: 0.2;
   padding: 5px;
   cursor: pointer;
   background: whitesmoke;
@@ -91,7 +91,7 @@
 }
 
 .overlay-button:hover{
-  opacity: 100%;
+  opacity: 1;
   color: #29649e;
 }
 

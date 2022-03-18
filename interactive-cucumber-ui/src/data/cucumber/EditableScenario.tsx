@@ -3,7 +3,6 @@ export type StepStatus = { text: string, status: 'running' | 'failed' | 'passed'
 
 export class EditableScenario {
 
-    featureId?: string
     _feature?: string
     _name?: string
     _steps: StepStatus[] = []
@@ -102,7 +101,6 @@ export class EditableScenario {
         this._steps = []
         this._name = undefined
         this._tags = []
-        this.featureId = undefined
         this.featureName = undefined
         this.background = {
             name: "",

@@ -54,3 +54,8 @@ Open [http://localhost:28319](http://localhost:28319).
 Type your steps into the editor on the left, press Ctrl+Enter and see your steps executed.
 You can also see the steps defined on the right and see the existing features in the other tab.
 
+## Missing features / TODO
+There are many planned features or cut corners for a fully satisfying user experience. Consider this current version as a prototype. 
+Please report any issues or features you'd like to see, but didn't see mentioned anywhere. 
+
+See (current roadmap)[roadmap.md] for planned features and feel free to contribute!

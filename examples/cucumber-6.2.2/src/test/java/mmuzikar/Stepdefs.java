@@ -27,7 +27,7 @@ public class Stepdefs {
         Selenide.open(page);
     }
 
-    @When("^user is on the \"([^\"]*)\" page$")
+    @When("^user is on the blaze-demo page$")
     public void openPage(String page) {
         Selenide.open("https://blazedemo.com/");
     }
@@ -96,14 +96,9 @@ public class Stepdefs {
         formData.forEach((key, value) -> $(By.id(str)).$(By.name(key)).setValue(value));
     }
 
-    @When("^switch to images$")
-    public void switchToImages() throws Exception {
+    @When("^throw exception$")
+    public void throwException() throws Exception {
         throw new Exception("This has failed on purpose, tell me if you noticed this :)");
-    }
-
-    @When("^submit search$")
-    public void submit() {
-        $(By.cssSelector(".Tg7LZd")).click();
     }
 
     @When("submit docstring")

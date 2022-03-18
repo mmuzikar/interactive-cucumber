@@ -4,7 +4,7 @@ Feature: Agent exposes basic Cucumber functionality
     Given running testsuite
   
   Scenario: Step registry is exposed
-    Then check 32 steps are registered
+    Then check 31 steps are registered
     And check "I add {int} and {int}" step has arguments
       | int |
       | int |
@@ -24,11 +24,11 @@ Feature: Agent exposes basic Cucumber functionality
   Scenario: Features are exposed
     Then verify response from "/feature" contains
     """
-    classpath:mmuzikar/features/calculator.feature
+    mmuzikar/features/calculator.feature
     """
     Then verify response from "/feature" contains
     """
-    classpath:mmuzikar/features/dates.feature
+    mmuzikar/features/dates.feature
     """
     Then verify response from "/feature" contains
     """

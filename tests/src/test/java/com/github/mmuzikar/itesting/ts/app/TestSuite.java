@@ -4,13 +4,12 @@ import org.junit.jupiter.api.Assertions;
 
 import org.apache.commons.io.IOUtils;
 import org.awaitility.Awaitility;
-import org.awaitility.Duration;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Date;
 
 import io.restassured.RestAssured;
@@ -31,9 +30,12 @@ public class TestSuite implements AutoCloseable {
             .redirectError(new File(logPrefix + "err.log"))
             .start();
         log.info("App running with logs at {}", logPrefix);
-        Awaitility.await().atMost(Duration.ONE_MINUTE).pollInterval(Duration.FIVE_SECONDS).until(() -> {
+        Awaitility.await().atMost(Duration.ofMinutes(10)).pollInterval(Duration.ofSeconds(5)).until(() -> {
+            if (!process.isAlive()) {
+                throw new IllegalStateException("Testsuite process failed while starting");
+            }
             try {
-                return RestAssured.get("/").thenReturn().statusCode() == 200;
+                return getLogs().contains("Running mmuzikar.RunCucumberTest") && RestAssured.get("/").thenReturn().statusCode() == 200;
             } catch (Exception e) {
                 return false;
             }

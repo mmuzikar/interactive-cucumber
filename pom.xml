@@ -5,8 +5,33 @@
 	<groupId>com.github.mmuzikar</groupId>
 	<artifactId>interactive-cucumber</artifactId>
 
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
+
+	<name>interactive-cucumber-project</name>
+	<description>Modify Cucumber test runner to allow writing tests in real-time.</description>
+	<url>https://www.github.com/mmuzikar/interactive-cucumber</url>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Martin Muzikar</name>
+			<email>mmuzikar@redhat.com</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/mmuzikar/interactive-cucumber.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:mmuzikar/interactive-cucumber.git</developerConnection>
+		<url>https://github.com/mmuzikar/interactive-cucumber</url>
+	</scm>
 
 	<modules>
 		<module>interactive-cucumber-agent</module>
@@ -19,13 +44,126 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.version>1.0-SNAPSHOT</project.version>
 		<maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+		<maven.source.plugin.version>2.2.1</maven.source.plugin.version>
+		<maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
+		<maven.gpg.plugin.version>1.5</maven.gpg.plugin.version>
 		<maven.jar.plugin.version>3.2.0</maven.jar.plugin.version>
 		<maven.resources.plugin.version>3.2.0</maven.resources.plugin.version>
+		<maven.deploy.plugin.version>2.7</maven.deploy.plugin.version>
 		<gmaven.plugin.version>2.1.1</gmaven.plugin.version>
 		<gmaven-plus.plugin.version>1.12.1</gmaven-plus.plugin.version>
 		<groovy.version>3.0.8</groovy.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<skip.gpg>false</skip.gpg>
+
+		<commons.io.version>2.8.0</commons.io.version>
+		<gson.version>2.8.2</gson.version>
+		<cucumber.version>6.2.2</cucumber.version>
+		<javaassist.version>3.27.0-GA</javaassist.version>
+		<therapi-javadoc.version>0.12.0</therapi-javadoc.version>
+		<asm.version>9.2</asm.version>
 	</properties>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven.compiler.plugin.version}</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven.source.plugin.version}</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven.javadoc.plugin.version}</version>
+					<configuration>
+						<additionalJOption>-Xdoclint:none</additionalJOption>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>${maven.gpg.plugin.version}</version>
+					<executions>
+						<execution>
+							<id>sign-artifacts</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>sign</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<useAgent>true</useAgent>
+						<keyname>05011D6DB12F5D71C04EF4D3119CF49822183468</keyname>
+						<skip>${skip.gpg}</skip>
+<!--						<gpgArguments>-->
+<!--							<arg>&#45;&#45;allow-weak-digest-algos</arg>-->
+<!--						</gpgArguments>-->
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release-central</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.7</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

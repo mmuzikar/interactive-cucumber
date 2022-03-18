@@ -1,42 +1,36 @@
-import Editor from "@monaco-editor/react"
+import Editor, { DiffEditor } from "@monaco-editor/react"
 import { useContext, useEffect, useMemo, useState } from "react"
 import { useAlert } from "react-alert"
 import { FaTimesCircle } from "react-icons/fa"
 import { CucumberContext } from "../data/CucumberContext"
-import { BACKGROUND_CONFLICT_PREFIX, diffScenarioBackground, mergeScenarioToFeature } from "../utils/textutils"
+import { BACKGROUND_CONFLICT_PREFIX, diffScenarioBackground, featureNameToUri, FEATURE_AUTO_NAME, mergeScenarioToFeature } from "../utils/textutils"
 import { saveScenario } from "../utils/Utils"
+
+export const DIFF_LANGUAGE = 'feature-diff'
 
 export function SavePrompt({ close }: { close: () => void }) {
 
     const cucumber = useContext(CucumberContext)
     const alert = useAlert()
 
-    const [feature, setFeature] = useState(cucumber.currentScenario.featureId)
+    const [feature, setFeature] = useState(() => {
+        if (cucumber.currentScenario.featureName) {
+            const feat = cucumber.features.find(feat => feat.name === cucumber.currentScenario.featureName)
+            return feat ? feat.uri : featureNameToUri(cucumber.currentScenario.featureName)
+        } else {
+            return featureNameToUri(FEATURE_AUTO_NAME)
+        }
+    })
     const [scenario, setScenario] = useState(cucumber.currentScenario.name)
 
     const [featureSource, setFeatureSource] = useState<string>()
 
     let featureInput
 
-    let uri = cucumber.currentScenario.featureId
-
     useEffect(() => {
         cucumber.currentScenario.name = scenario
     }, [scenario, cucumber.currentScenario])
 
-    if (!uri) {
-        if (cucumber.currentScenario.featureName) {
-            const foundFeat = cucumber.features.find(feat => feat.name === cucumber.currentScenario.featureName)
-            if (foundFeat) {
-                uri = foundFeat.uri
-                setFeature(uri)
-            } else {
-                const uriProposal = cucumber.currentScenario.featureName.replaceAll(/\s/g, '_').toLowerCase() + '.feature'
-                setFeature(uriProposal)
-                featureInput = <input type='string' value={feature} onChange={e => setFeature(e.target.value)} list='feature-suggestion' />
-            }
-        }
-    }
     featureInput = <input type='string' placeholder='features/myFeature.feature' value={feature} onChange={e => setFeature(e.target.value)} list='feature-suggestion' />
 
     const currentFeature = useMemo(() => {
@@ -54,7 +48,7 @@ export function SavePrompt({ close }: { close: () => void }) {
                 //Check if background matches the new scenario
                 if (currentFeature.background) {
                     let areSame = currentFeature.background.steps.length === steps.length
-                    areSame = areSame && currentFeature.background.steps.every((s, i) => steps[i].text === s.text)
+                    areSame = areSame && currentFeature.background.steps.every((s, i) => steps[i].text === s.keyword + s.text)
                     //User input is needed
                     return !areSame
                 } else {
@@ -85,12 +79,17 @@ export function SavePrompt({ close }: { close: () => void }) {
         close()
     }
 
+    let source = mergeScenarioToFeature(currentFeature, cucumber.currentScenario)
+
+    if (backgroundsDifferent) {
+        source = diffScenarioBackground(source,  cucumber.currentScenario.background.steps)
+    }
 
     //TODO: split editor from input editor and provide features for easier resolving of conflicts
     return <div>
         <h2>Save scenario</h2>
         <div>
-            <label>Feature</label>
+            <label>Feature URI</label>
             {featureInput}
             <datalist id='feature-suggestion'>
                 {cucumber.features.map(f => <option value={f.uri} label={f.name} />)}
@@ -106,8 +105,7 @@ export function SavePrompt({ close }: { close: () => void }) {
 
         <input type='submit' onClick={submit} disabled={feature === undefined || scenario === undefined || !conflictsResolved} />
 
-        
-        {backgroundsDifferent ? <Editor onChange={(e) => setFeatureSource(e)} language='feature' value={diffScenarioBackground(mergeScenarioToFeature(currentFeature!, cucumber.currentScenario), cucumber.currentScenario.background.steps)} width={window.screen.availWidth / 2} height={window.screen.availHeight / 2} /> : <></>}
+        <Editor onChange={(e) => setFeatureSource(e)} language={DIFF_LANGUAGE} value={source} width={window.screen.availWidth / 2} height={window.screen.availHeight / 2} />
 
         <FaTimesCircle style={{ position: 'fixed', right: 0, top: 0, padding: '5px', fontSize: '150%', cursor: 'pointer' }} onClick={close} />
     </div>

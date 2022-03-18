@@ -1,10 +1,11 @@
-import Editor, { OnMount } from "@monaco-editor/react";
+import Editor, { Monaco, OnMount } from "@monaco-editor/react";
 import { CancellationToken, editor, languages, Position, Range } from "monaco-editor";
 import { useContext, useRef } from "react";
 import { useAlert } from "react-alert";
-import { useEffectOnce } from "react-use";
+import { useBoolean, useEffectOnce } from "react-use";
 import { CucumberContext } from "../data/CucumberContext";
 import { initServices, ServiceManager } from "../services/Service";
+import { DIFF_LANGUAGE } from "./SavePrompt";
 
 
 const INPUT_LANG_ID = "feature"
@@ -19,6 +20,41 @@ Feature: My awesome feature
 `.trim()
 
 
+const MONARCH: languages.IMonarchLanguage = {
+    defaultToken: 'invalid',
+    symbols: ['"', "'"],
+    tokenizer: {
+        root: [
+            [/#.*$/, 'comment'],
+            [/@[\w-]*/, 'annotation'],
+            [/(?:Feature|Scenario|Background):/, 'keyword', '@description'],
+            [/(?:Then|When|And|Given|But)/, 'keyword', '@step'],
+            [/\|/, 'delimiter', '@table'],
+            [/"""/, 'string', '@multilineString']
+        ],
+        description: [
+            [/.*/, 'identifier', '@pop']
+        ],
+        table: [
+            [/[^|]/, 'string.table'],
+            [/\|\s*$/, 'delimiter', '@pop'],
+            [/\|/, 'delimiter'],
+        ],
+        step: [
+            [/"[^"]*"$/, 'string', '@pop'],
+            [/\S$/, 'identifier', '@pop'],
+            [/\s$/, 'whitespace', '@pop'],
+            [/"[^"]*"/, 'string'],
+            [/\S/, 'identifier'],
+            [/\s/, 'whitespace']
+        ],
+        multilineString: [
+            [/.*"""/, 'string', '@pop'],
+            [/.*$/, 'string'],
+        ]
+    }
+};
+
 export const InputEditor = () => {
 
     const cucumber = useContext(CucumberContext)
@@ -30,44 +66,20 @@ export const InputEditor = () => {
         initServices(alert, cucumber)
     })
 
+    const setContent = (text: string) => {
+        editorRef?.current?.setValue(text)
+    }
+
+    cucumber.setEditorContent = setContent
+
     const editorDidMount: OnMount = (editor, monaco) => {
         editorRef.current = editor
+        const clearDefaultText = editor.onMouseDown((e) => {setContent('#Write your cucumber scenarios here'); clearDefaultText.dispose()})
 
         monaco.languages.register({ id: INPUT_LANG_ID })
-        monaco.languages.setMonarchTokensProvider(INPUT_LANG_ID, {
-            defaultToken: 'invalid',
-            symbols: ['"', "'"],
-            tokenizer: {
-                root: [
-                    [/#.*$/, 'comment'],
-                    [/@[\w-]*/, 'annotation'],
-                    [/(?:Feature|Scenario|Background):/, 'keyword', '@description'],
-                    [/(?:Then|When|And|Given|But)/, 'keyword', '@step'],
-                    [/\|/, 'delimiter', '@table'],
-                    [/"""/, 'string', '@multilineString']
-                ],
-                description: [
-                    [/.*/, 'identifier', '@pop']
-                ],
-                table: [
-                    [/[^|]/, 'string.table'],
-                    [/\|\s*$/, 'delimiter', '@pop'],
-                    [/\|/, 'delimiter'],
-                ],
-                step: [
-                    [/"[^"]*"$/, 'string', '@pop'],
-                    [/\S$/, 'identifier', '@pop'],
-                    [/\s$/, 'whitespace', '@pop'],
-                    [/"[^"]*"/, 'string'],
-                    [/\S/, 'identifier'],
-                    [/\s/, 'whitespace']
-                ],
-                multilineString: [
-                    [/.*"""/, 'string', '@pop'],
-                    [/.*$/, 'string'],
-                ]
-            }
-        })
+        monaco.languages.register({ id: DIFF_LANGUAGE })
+        monaco.languages.setMonarchTokensProvider(INPUT_LANG_ID, MONARCH)
+        monaco.languages.setMonarchTokensProvider(DIFF_LANGUAGE, MONARCH)
 
         const removeBackgroundCommandId = editor.addCommand(0, (ctx, model: editor.ITextModel, lineNum: number) => {
             const startLineNum = lineNum
@@ -274,12 +286,6 @@ export const InputEditor = () => {
 
         editor.addOverlayWidget(new RunScenarioWidget(editor))
     }
-
-    const setContent = (text: string) => {
-        editorRef?.current?.setValue(text)
-    }
-
-    cucumber.setEditorContent = setContent
 
     return (
         <Editor height="100%"

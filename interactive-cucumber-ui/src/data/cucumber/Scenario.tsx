@@ -1,4 +1,5 @@
 import * as messages from "@cucumber/messages";
+import { Feature } from "./Feature";
 
 export class Scenario {
     name: string
@@ -6,12 +7,14 @@ export class Scenario {
 
     steps: readonly messages.Step[]
     background?: messages.Background
+    feature: Feature
 
-    constructor(scenario: messages.Scenario, background?: messages.Background) {
+    constructor(scenario: messages.Scenario, feature: Feature, background?: messages.Background, ) {
         this.name = scenario.name
         this.tags = scenario.tags.map(tag => tag.name)
         this.steps = scenario.steps
         this.background = background
+        this.feature = feature
     }
 
     private stepsToText(steps: readonly messages.Step[]): string {
@@ -40,6 +43,8 @@ export class Scenario {
             const background = this.background.keyword + ": " + this.background.name + "\n" + this.stepsToText(this.background.steps) + '\n\n'
             ret = background + ret
         }
+
+        ret = `Feature: ${this.feature.name}\n` + ret.split('\n').map(val => '\t' + val).join('\n')
 
         return ret
     }
