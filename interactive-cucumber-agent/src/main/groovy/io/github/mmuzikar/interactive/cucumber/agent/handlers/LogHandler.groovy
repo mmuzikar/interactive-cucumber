@@ -31,6 +31,8 @@ class LogHandler implements Handler{
     }
 
     private void setupLoggers(){
+
+
         Logger global = Logger.getGlobal();
         while (global.getParent() != null){
             global = global.getParent();

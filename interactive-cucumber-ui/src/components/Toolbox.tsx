@@ -107,7 +107,7 @@ const StepDefPanel = ({ height }: PanelProps) => {
 
     const renderStepDef = (i: number, key: string | number) => {
         return (
-            <li key={`stepdef-ungrouped-${i}`} data-for='stepdefs-tooltip' data-tip={i}>{stepDefs[i].getPatternWithoutControlChars()}</li>
+            <li key={`stepdef-ungrouped-${i}`} data-for='stepdefs-tooltip' data-tip={i} onClick={() => cucumber.addLineToEditor?.('Given ' + stepDefs[i].asSnippetPattern() + '\n')}>{stepDefs[i].getPatternWithoutControlChars()}</li>
         )
     }
 
