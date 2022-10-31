@@ -19,6 +19,7 @@ export class CucumberContextType {
     private stepQueue: Queue
 
     setEditorContent?: (text: string) => void
+    addLineToEditor?: (text: string) => void
 
     currentScenario: EditableScenario = new EditableScenario()
 
@@ -45,7 +46,7 @@ export class CucumberContextType {
             fetchAPI('feature').then(resp => resp.json()).then(data => data.map((it: any) => new Feature(it.source, it.uri)))
         ])
 
-        console.log(data);
+        console.log('Init values', data);
 
         return new CucumberContextType(...data)
     }
@@ -61,6 +62,10 @@ export class CucumberContextType {
 
     findSteps(stepText: string) {
         return this.fuse.search(stepText)
+    }
+
+    findClosestStep(stepText: string) {
+        return this.fuse.search(stepText, {limit: 1})
     }
 
     isValidStep(stepText: string): boolean {

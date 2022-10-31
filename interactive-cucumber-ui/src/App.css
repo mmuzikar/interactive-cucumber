@@ -6,9 +6,12 @@
   color: #bb0523;
 }
 
-.step-failed:hover,.step-passed:hover {
-  text-decoration: line-through;
-  cursor: pointer;
+.step button {
+  display: none;
+}
+
+.step:hover button {
+  display: unset;
 }
 
 .step-passed {

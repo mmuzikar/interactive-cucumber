@@ -15,7 +15,7 @@ export const Log = () => {
 
     const UPDATE_DELAY = 250;
 
-    const [list, { insertAt, set: setList }] = useList<LogItem>([]);
+    const [list, { insertAt, set: setList, clear }] = useList<LogItem>([]);
     const [size, { set: setSize }] = useCounter(25, null, 10)
     const push = insertAt.bind(list, 0)
     const [update, toggleUpdate] = useToggle(true)
@@ -59,6 +59,7 @@ export const Log = () => {
                 <label>Max log size</label>
                 <input type="number" value={size} onChange={(val) => setSize(val.target.valueAsNumber)} />
                 <input type="button" onClick={toggleUpdate} value={update ? 'Stop updating' : 'Start updating'} />
+                <input type="button" onClick={clear} value="Clear log"/>
             </div>
             <div style={{ maxHeight: "100%", overflow: 'auto' }}>
                 <ReactList itemRenderer={renderLog} length={list.length} />

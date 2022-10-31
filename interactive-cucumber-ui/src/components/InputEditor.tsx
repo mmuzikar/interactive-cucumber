@@ -71,10 +71,18 @@ export const InputEditor = () => {
     }
 
     cucumber.setEditorContent = setContent
+    cucumber.addLineToEditor = (text: string) => {
+        editorRef?.current?.executeEdits('toolbox', [{range: new Range(0,0,0,0), text: text}])
+    }
 
     const editorDidMount: OnMount = (editor, monaco) => {
         editorRef.current = editor
-        const clearDefaultText = editor.onMouseDown((e) => {setContent('#Write your cucumber scenarios here'); clearDefaultText.dispose()})
+        const clearDefaultText = editor.onMouseDown((e) => {
+            if (editor.getValue() === DEFAULT_TEXT) {
+                setContent('#Write your cucumber scenarios here'); 
+            }
+            clearDefaultText.dispose()
+        })
 
         monaco.languages.register({ id: INPUT_LANG_ID })
         monaco.languages.register({ id: DIFF_LANGUAGE })
@@ -198,19 +206,19 @@ export const InputEditor = () => {
                         insertTextRules: languages.CompletionItemInsertTextRule.InsertAsSnippet
                     })) as languages.CompletionItem[]
 
-                    const closestSteps = cucumber.findSteps(stepRegex[1])
-                    if (closestSteps.length > 0 && closestSteps[0].score && closestSteps[0].score > 0.1) {
-                        const suggestionPromise = closestSteps[0].item.provideSuggestions(stepRegex[1])
+                    const closestStep = cucumber.findClosestStep(stepRegex[1])
+                    if (closestStep) {
+                        const suggestionPromise = closestStep[0].item.provideSuggestions(stepRegex[1])
                         const suggestionsForArgs = await suggestionPromise
                         //If suggestions returned something then suggestions should be shown
                         if (suggestionsForArgs.length > 0) {
                             //Take suggestion for each arg and create completion items from them and flatten them to one list
-                            const sugs: languages.CompletionItem[] = suggestionsForArgs.map(suggestions => suggestions.val.map(val => ({
+                            sugs.push(...suggestionsForArgs.map(suggestions => suggestions.val.map(val => ({
                                 insertText: val,
                                 kind: languages.CompletionItemKind.Value,
                                 label: `Arg #${suggestions.id}: ${val}`,
                                 range: range,
-                            }))).flat()
+                            }))).flat())
                             return {
                                 suggestions: sugs
                             }

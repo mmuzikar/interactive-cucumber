@@ -112,7 +112,7 @@ export class EditableScenario {
     getText(containBackground = true) {
         let scenario = `
 ${this._tags}
-Scenario: ${this.name}
+${this._name? `Scenario: ${this.name}` : ''}
 ${this._steps.map(step => '\t' + step.text).join('\n')}
         `.trim()
 

@@ -89,7 +89,13 @@ export class StepDefinition {
             }
         } else {
             let i = 1;
-            let snippet = this.pattern.replaceAll(/{[^}]*}/g, (val) => `\${${i++}:${val}}`)
+            let snippet = this.pattern.replaceAll(/{[^}]*}/g, (val) => {
+                if (val === '{string}') {
+                    return `"\${${i++}:...}"`
+                } else {
+                    return `\${${i++}:${val}}`
+                }
+            })
             if (this.arguments[this.arguments.length - 1]?.type.endsWith("DataTable")) {
                 snippet += `\n\t| \${${i + 1}:<table-val>} |`;
             } else if (i === this.arguments.length && this.arguments[this.arguments.length - 1]?.type.endsWith("String")) {
@@ -108,8 +114,8 @@ export class StepDefinition {
 
     public async provideSuggestions(text: string): Promise<{ id: number, val: string[] }[]> {
         if (this.arguments) {
+            let ret: Promise<{ id: number, val: string[] }>[] = []
             for (let i = 0; i < this.arguments.length; i++) {
-                let ret: Promise<{ id: number, val: string[] }>[] = []
                 if (this.arguments[i].suggProvider && this.arguments[i].suggProvider.length > 0) {
                     ret.push(new Promise(async (resolve, reject) => {
                         const resp = await postApi('suggestions', JSON.stringify({
@@ -123,8 +129,8 @@ export class StepDefinition {
                         })
                     }));
                 }
-                return Promise.all(ret)
             }
+            return Promise.all(ret)
         }
         return Promise.resolve([])
     }

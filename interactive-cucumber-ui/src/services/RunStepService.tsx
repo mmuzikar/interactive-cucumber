@@ -44,7 +44,7 @@ export class RunStepService implements Service {
                     stepValue += '\n' + quotes
                 } else if (line.startsWith('|')) {
                     while (i <= lineCount && model.getLineContent(i).trim().startsWith('|')) {
-                        stepValue += '\n' + model.getLineContent(i)
+                        stepValue += '\n' + model.getLineContent(i).trim()
                         i++;
                     }
                 }

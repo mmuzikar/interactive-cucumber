@@ -2,6 +2,7 @@ import { editor } from "monaco-editor";
 import { AlertManager } from "react-alert";
 import { CucumberContextType } from "../data/CucumberContext";
 import { NamingService } from "./NamingService";
+import { RunScriptService } from "./RunScriptService";
 import { RunStepService } from "./RunStepService";
 import { TagService } from "./TagService";
 
@@ -22,6 +23,7 @@ class ServiceManagerImpl implements Service {
         this.services.push(new RunStepService(this.alert, this.cucumber))
         this.services.push(new NamingService(this.cucumber))
         this.services.push(new TagService(this.cucumber))
+        this.services.push(new RunScriptService(this.alert, this.cucumber))
     }
 
     findService(model: editor.ITextModel, lineNum: number) : Service | undefined {

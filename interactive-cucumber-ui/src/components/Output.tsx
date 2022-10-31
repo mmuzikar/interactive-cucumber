@@ -40,9 +40,41 @@ export const Output = () => {
         return <div className='backdrop' onClick={() => setSaving(false)} />
     }
 
-    const renderStepList = (steps: StepStatus[], prefix: string) => <ul className='output-list'>
-        {steps.map((step, i) => <li key={`${prefix}-step-${i}`} className={`step-${step.status}`} onClick={() => removeFailedStep(i, prefix)}>{withLineBreaks(step.text)}</li>)}
-    </ul>
+    function RemoveButton({ i, prefix, onRemove, text }: { i: number, prefix: string, text: string, onRemove?: () => void }) {
+        return <button onClick={e => { onRemove?.(); removeFailedStep(i, prefix) }} >{text}</button>
+    }
+
+    function Tags() {
+        return cucumber.currentScenario.tags ? <ul>{cucumber.currentScenario.tags.map(tag => <li>{tag}</li>)}</ul> : <></>
+    }
+
+    function FeatureName() {
+        return cucumber.currentScenario.featureName ? <><strong>Feature: {cucumber.currentScenario.featureName}</strong><br /></> : <></>
+    }
+
+    function Background() {
+        if (cucumber.currentScenario.hasBackground()) {
+            return <div>
+                <strong>Background: {cucumber.currentScenario.background.name}</strong>
+                <StepList steps={cucumber.currentScenario.background.steps} prefix='background'/>
+            </div>
+        }
+        return <></>
+    }
+
+    function StepList({steps, prefix} : {steps: StepStatus[], prefix: string}) {
+        return <ul className='output-list'>
+            {steps.map((step, i) => <li key={`${prefix}-step-${i}`} className={`step-${step.status} step`}>
+                {withLineBreaks(step.text)}
+                <RemoveButton i={i} prefix={prefix} text='Remove' />
+                <RemoveButton i={i} prefix={prefix} text='Edit' onRemove={() => cucumber.addLineToEditor?.(step.text)} />
+            </li>)}
+        </ul>
+    }
+
+    function ScenarioName() {
+        return <strong>Scenario: {cucumber.currentScenario.name ? cucumber.currentScenario.name : <span className='log-error'>No scenario name set</span>}</strong>
+    }
 
     return (
         <div className='grid-item'>
@@ -54,15 +86,12 @@ export const Output = () => {
             </div>
             <div style={{ width: '100%', borderBottom: '1px solid #cccbcc' }} />
             <div className='code-text'>
-                {cucumber.currentScenario.tags ? <ul>{cucumber.currentScenario.tags.map(tag => <li>{tag}</li>)}</ul> : <></>}
-                {cucumber.currentScenario.featureName ? <><strong>Feature: {cucumber.currentScenario.featureName}</strong><br /></> : <></>}
-                {cucumber.currentScenario.hasBackground() ? <div>
-                    <strong>Background: {cucumber.currentScenario.background.name}</strong>
-                    {renderStepList(cucumber.currentScenario.background.steps, 'background')}
-                </div> : <></>}
+                <Tags />
+                <FeatureName />
+                <Background />
 
-                <strong>Scenario: {cucumber.currentScenario.name ? cucumber.currentScenario.name : <span className='log-error'>No scenario name set</span>}</strong>
-                {renderStepList(cucumber.currentScenario.steps, 'scenario')}
+                <ScenarioName />
+                <StepList steps={cucumber.currentScenario.steps} prefix='scenario'/>
             </div>
             {isSaving ? <Modal className='modal' renderBackdrop={renderBackdrop} show={isSaving}><SavePrompt close={() => setSaving(false)} /></Modal> : <></>}
         </div>
