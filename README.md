@@ -1,4 +1,4 @@
-# Interactive testing 
+# Interactive testing
 
 See your tests' results as you're writing them. A REPL for your JUnit Cucumber BDD tests.
 
@@ -8,7 +8,7 @@ No additional code required, just add a dependency and configure your test runne
 Currently tested configration is Cucumber 6.2.2 + JUnit 4.13. More configurations coming in the future.
 
 ## Setup
-Add following dependency to your project: 
+Add following dependency to your project:
 ```
 <dependency>
     <groupId>io.github.mmuzikar</groupId>
@@ -28,7 +28,7 @@ And configure your runner to run on a specific profile, eg.
 ```
 
 ## Contents
-* interactive-cucumber-agent - the code responsible for customizing testsuites 
+* interactive-cucumber-agent - the code responsible for customizing testsuites
 * tests - integration tests, currently only for the generated REST endpoint
 * interactive-cucumber-ui - UI for writing your tests
 * examples - example and an example testsuite to be tested by tests
@@ -50,12 +50,12 @@ Registered path / @ io.github.mmuzikar.interactive.cucumber.agent.handlers.UiHan
 Registered path /save @ io.github.mmuzikar.interactive.cucumber.agent.handlers.SaveHandler
 Server is open http://localhost:28319
 ```
-Open [http://localhost:28319](http://localhost:28319). 
+Open [http://localhost:28319](http://localhost:28319).
 Type your steps into the editor on the left, press Ctrl+Enter and see your steps executed.
 You can also see the steps defined on the right and see the existing features in the other tab.
 
 ## Missing features / TODO
-There are many planned features or cut corners for a fully satisfying user experience. Consider this current version as a prototype. 
-Please report any issues or features you'd like to see, but didn't see mentioned anywhere. 
+There are many planned features or cut corners for a fully satisfying user experience. Consider this current version as a prototype.
+Please report any issues or features you'd like to see, but didn't see mentioned anywhere.
 
-See (current roadmap)[roadmap.md] for planned features and feel free to contribute!
+See [current roadmap](roadmap.md) for planned features and feel free to contribute!
