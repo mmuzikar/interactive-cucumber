@@ -7,10 +7,11 @@ import io.cucumber.java.en.Then;
 
 public class TestSuiteSteps {
 
-    public static final TestSuite testsuite = new TestSuite();
+    public static TestSuite testsuite;
 
-    @Given("running testsuite")
-    public void runTestsuite() {
+    @Given("running testsuite with version {string}")
+    public void runTestsuite(String version) {
+        testsuite = new TestSuite(version);
         testsuite.restart();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {

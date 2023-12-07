@@ -1,8 +1,11 @@
 package io.github.mmuzikar.interactive.cucumber.agent.data
 
+import io.cucumber.core.runtime.Runtime
+import io.github.mmuzikar.interactive.cucumber.agent.CucumberInterceptor
 import io.github.mmuzikar.interactive.cucumber.agent.handlers.RunStepHandler
 
 import io.cucumber.core.gherkin.Feature
+import javassist.ClassPool
 
 class Cucumber implements GroovyObject {
 
@@ -15,11 +18,12 @@ class Cucumber implements GroovyObject {
     TypeRegistry typeRegistry
     List<Feature> features
 
+
     Cucumber(origObject) {
         this.origObject = origObject;
-        this.runner = origObject.context.runnerSupplier.get()
-        this.features = origObject.features
-        this.typeRegistry = new TypeRegistry(runner.createTypeRegistryForPickle(null))
+        this.runner = _getRunner(origObject)
+        this.features = _getFeatures(origObject)
+        this.typeRegistry = new TypeRegistry(runner.createTypeRegistryForPickle(features.first().pickles.first()))
 
         this.glue = new Glue(runner.glue, runner)
 
@@ -57,4 +61,27 @@ class Cucumber implements GroovyObject {
         return Optional.empty()
     }
 
+    private def _getRunner(Object o) {
+        if (o.hasProperty("context")) {
+            o.context.runnerSupplier.get()
+        } else if (o.hasProperty("runnerSupplier")) {
+            o.runnerSupplier.get()
+        } else {
+            throw new RuntimeException("Can't find runner supplier field in cucumber")
+        }
+    }
+
+    private def _getFeatures(Object o) {
+        if (o.hasProperty("features")) {
+            return o.features
+        } else if (o.hasProperty("children")){
+            return o.children*.feature
+        } else {
+            return CucumberInterceptor.constructedFeatures
+        }
+//        else {
+//            Runtime.builder().build()
+//            return Runtime.instance.featureSupplier.get()
+//        }
+    }
 }

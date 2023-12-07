@@ -1,7 +1,7 @@
 Feature: Agent exposes basic Cucumber functionality
   
   Background: Testsuite is running 
-    Given running testsuite
+    Given running testsuite with version "7.4.x"
   
   Scenario: Step registry is exposed
     Then check 31 steps are registered

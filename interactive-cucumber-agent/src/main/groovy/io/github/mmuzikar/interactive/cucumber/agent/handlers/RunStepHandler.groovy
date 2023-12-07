@@ -9,6 +9,19 @@ class RunStepHandler implements Handler {
 
     static def executor = Executors.newSingleThreadExecutor()
 
+    static {
+        executor.execute {
+            try {
+                Thread.currentThread().getContextClassLoader()
+                        .loadClass("io.cucumber.spring.CucumberTestContext")
+                        .getInstance().start();
+            } catch (e) {
+                //ignore
+//                e.printStackTrace()
+            }
+        }
+    }
+
     void handle(HttpExchange exchange) throws IOException {
         def body = getRequestBody(exchange)
 

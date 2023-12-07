@@ -10,22 +10,22 @@ import java.lang.annotation.Target;
  *
  * Usage:
  * <code>
- * public class ButtonSuggestionProvider implements ISuggestionProvider {
+ * public class ButtonSuggestionProvider implements SuggestionProvider {
  *
- *     public List<Object> provide(String step) {
+ *     public List<SuggestionItem> provide(String step) {
  *          return ui.findElements("button");
  *     }
  * }
  *
  * \@Given("click on button {string}")
- * public void clickOnButton(@Suggestion() String text) {
+ * public void clickOnButton(@Suggestion(ButtonSuggestionProvider.class) String text) {
  *     ...
  * }
  *
  * </code>
  */
-@Target(value = ElementType.PARAMETER)
+@Target(value = {ElementType.PARAMETER, ElementType.METHOD, ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Suggestion {
-    Class<? extends ISuggestionProvider> value();
+    Class<? extends SuggestionProvider> value();
 }

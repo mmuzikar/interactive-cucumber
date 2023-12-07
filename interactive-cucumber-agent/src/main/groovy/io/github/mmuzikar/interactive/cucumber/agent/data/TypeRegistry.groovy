@@ -1,7 +1,7 @@
 package io.github.mmuzikar.interactive.cucumber.agent.data
 
 import io.github.mmuzikar.interactive.cucumber.agent.utils.NoopSuggestionProvider
-import io.github.mmuzikar.interactive.cucumber.api.ISuggestionProvider
+import io.github.mmuzikar.interactive.cucumber.api.SuggestionProvider
 import io.cucumber.cucumberexpressions.ParameterType
 import io.cucumber.docstring.DocStringType
 
@@ -15,7 +15,7 @@ class TypeRegistry implements GroovyObject {
     DocStringTypeRegistry docStringTypeRegistry
     def tableTypeRegistry
 
-    Map<String, Class<? extends ISuggestionProvider>> typeSuggestionProviders = [:]
+    Map<String, Class<? extends SuggestionProvider>> typeSuggestionProviders = [:]
 
     TypeRegistry(origObject) {
         this.origObject = origObject
@@ -25,11 +25,11 @@ class TypeRegistry implements GroovyObject {
         this.tableTypeRegistry = origObject.dataTableTypeRegistry
     }
 
-    def registerSuggestionProviderForType(String typeId, Class<? extends ISuggestionProvider> suggestionProvider) {
+    def registerSuggestionProviderForType(String typeId, Class<? extends SuggestionProvider> suggestionProvider) {
         typeSuggestionProviders[typeId] = suggestionProvider
     }
 
-    Class<? extends ISuggestionProvider> getSuggestionsProviderForType(String typeId) {
+    Class<? extends SuggestionProvider> getSuggestionsProviderForType(String typeId) {
         return typeSuggestionProviders.getOrDefault(typeId, NoopSuggestionProvider)
     }
 
@@ -70,7 +70,11 @@ class TypeRegistry implements GroovyObject {
         }
 
         Collection<DocStringType> getDocStringTypes() {
-            return origObject.docStringTypesByContentType.values()
+            if (origObject.hasProperty("docStringTypesByContentType")) {
+                return origObject.docStringTypesByContentType.values()
+            } else {
+                return (origObject.docStringTypes as Map<String, Map<?, DocStringType>>).values().collectMany {it.values() }
+            }
         }
 
     }

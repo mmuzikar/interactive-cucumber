@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive cucumber editor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link id="vscode-codicon-stylesheet" rel="stylesheet" href="/assets/codicon.css"/>
+  </head>
+  <body>
+    <div id="app">
+      <div style="display: flex; gap: 20px;">
+        <div style="display: flex; flex: none; border: 1px solid var(--vscode-editorWidget-border)">
+          <div id="activityBar"></div>
+          <div id="sidebar" style="width: 250px"></div>
+        </div>
+        <div style="flex: 1; min-width: 0">
+          <!-- This is the code editor panel -->
+          <div id="editors"></div>
+
+          <vscode-button id="createReplFile">Create scripting file</vscode-button>
+          <br />
+        </div>
+        <div style="border: 1px solid var(--vscode-editorWidget-border); width: 300px; height: 75vh" id="auxiliaryBar"></div>
+      </div>
+
+      <div class="statusBars" style="height: 20vh;">
+        <div id="panel" style="height: 99%;"></div>
+
+        <div id="statusBar"></div>
+      </div>
+      
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

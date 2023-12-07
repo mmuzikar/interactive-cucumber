@@ -22,10 +22,16 @@ public class TestSuite implements AutoCloseable {
     private String logPrefix;
     private boolean isDirty;
 
+    private final String version;
+
+    public TestSuite(String version) {
+        this.version = version;
+    }
+
     public void start() throws IOException {
         logPrefix = "target/ts-" + new Date();
         process = new ProcessBuilder("mvn", "verify")
-            .directory(new File(Paths.get("..", "examples", "cucumber-6.2.2").toString()))
+            .directory(new File(Paths.get("..", "examples", "cucumber-" + version).toString()))
             .redirectOutput(new File(logPrefix + "out.log"))
             .redirectError(new File(logPrefix + "err.log"))
             .start();

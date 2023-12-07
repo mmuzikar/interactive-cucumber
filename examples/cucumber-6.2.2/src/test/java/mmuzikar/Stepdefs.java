@@ -28,7 +28,7 @@ public class Stepdefs {
     }
 
     @When("^user is on the blaze-demo page$")
-    public void openPage(String page) {
+    public void openPage() {
         Selenide.open("https://blazedemo.com/");
     }
 

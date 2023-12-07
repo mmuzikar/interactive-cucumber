@@ -10,7 +10,8 @@ enum Handlers implements GroovyObject {
     DOCS(new DocHandler()),
     UI(new UiHandler()),
     SAVE(new SaveHandler()),
-    RUN_SCRIPT(new RunScriptHandler())
+    RUN_SCRIPT(new RunScriptHandler()),
+    TEMPLATE(new FeatureTemplateHandler())
 
     Handler handler;
 

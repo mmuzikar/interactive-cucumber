@@ -9,5 +9,6 @@
 
     <modules>
         <module>cucumber-6.2.2</module>
+        <module>cucumber-7.4.x</module>
     </modules>
 </project>

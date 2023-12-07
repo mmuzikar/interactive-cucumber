@@ -10,6 +10,9 @@ class CucumberInterceptor implements GroovyObject {
 
     static Cucumber cucumber
     static def suggestionProviders = []
+    static boolean ready = false
+
+    public static List<Object> constructedFeatures = []
 
     static def fillValues(cucumber) {
         try {
@@ -21,11 +24,11 @@ class CucumberInterceptor implements GroovyObject {
         } catch (e) {
             throw new RuntimeException("Couldn't read Cucumber structure, the Cucumber version might be incompatible with this agent", e)
         }
+        ready = true
     }
 
     static Object childrenInvoker(notifier, cucumber) {
         println("Running children invoker");
-        fillValues(cucumber);
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress(Configuration.getExposedPort()), 5);
             Handlers.values().each {
@@ -38,6 +41,7 @@ class CucumberInterceptor implements GroovyObject {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        fillValues(cucumber);
         Thread.currentThread().suspend();
         return new Object();
     }

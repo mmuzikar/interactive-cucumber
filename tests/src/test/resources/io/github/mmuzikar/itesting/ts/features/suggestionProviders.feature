@@ -1,7 +1,7 @@
 Feature: Suggestion providers
   
   Background: 
-    Given running testsuite
+    Given running testsuite with version "7.4.x"
 
   @rest
   Scenario: Suggestion providers are picked up 
